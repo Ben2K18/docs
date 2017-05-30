@@ -12,8 +12,8 @@ apt-get update
 apt-get -y install docker-ce
 
 2) 修改docker container的存储路径为/data/docker
-   sed -i 's/^DOCKER_OPTS=""$/DOCKER_OPTS=" --graph \/data\/docker "/' /etc/init.d/docker
-   
+   mv /var/lib/docker /data/docker
+   ln -s /data/docker /var/lib/
    /etc/init.d/docker restart
 
 3) 创建一个ubuntu:16.04的名为myubuntu的docker, 挂载主机目录/data/docker/data/node.qcourse.cc为docker内/data
