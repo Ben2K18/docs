@@ -11,15 +11,19 @@ apt-get update
 
 apt-get -y install docker-ce
 
-
-2) 创建一个ubuntu:16.04的名为myubuntu的docker
-   docker run -d -it -name myubuntu  ubuntu:16.04
+2) 修改docker container的存储路径为/data/docker
+   sed -i 's/^DOCKER_OPTS=""$/DOCKER_OPTS=" --graph \/data\/docker "/' /etc/init.d/docker
    
-3) 列出所有的docker
+   /etc/init.d/docker restart
+
+3) 创建一个ubuntu:16.04的名为myubuntu的docker
+   docker run -it -d -p 8080:80 -p 2222:22 -v /data/docker/data/node.qcourse.cc:/data --name <b>myubuntu</b> ubuntu:16.04 /bin/bash
+   
+4) 列出所有的docker
    docker ps -a
    
-4) 进入docker
-   docker exec -it myubuntu bash
+5) 进入docker
+   docker exec -it <b>myubuntu</b> bash
    
    更新docker内的软件
    # apt update
@@ -35,7 +39,7 @@ apt-get -y install docker-ce
    安装mysql / nginx 
    apt-get install nginx-extras mysql-server-5.7 mysql-client-5.7
    
-5) 添加端口映射
+6) 添加端口映射
 #!/bin/bash
 # Script: portmap.sh
 # Usage: <b>./portmap.sh</b>  8080  <b>myubuntu</b> 80
