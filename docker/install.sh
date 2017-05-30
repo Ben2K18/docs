@@ -20,7 +20,13 @@ apt-get -y install docker-ce
    docker run -it -d -p 8080:80 -p 2222:22 -v /data/docker/data/node.qcourse.cc:/data --name <b>myubuntu</b> ubuntu:16.04 /bin/bash
    
 4) 列出所有的docker
-   docker ps -a
+   docker ps -a 
+   
+   只列出docker id
+   docker ps -a -q
+   
+   删除所有非运行中的docker
+   docker rm $(docker ps -a -q)
    
 5) 进入docker
    docker exec -it <b>myubuntu</b> bash
