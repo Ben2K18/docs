@@ -17,7 +17,7 @@ apt-get -y install docker-ce
    /etc/init.d/docker restart
 
 3) 创建一个ubuntu:16.04的名为myubuntu的docker, 挂载主机目录/data/docker/data/node.qcourse.cc为docker内/data
-   docker run -it -d -p 8080:80 -p 2222:22 -v /data/docker/data/node.qcourse.cc:/data --name <b>myubuntu</b> ubuntu:16.04 /bin/bash
+   docker run -it -d -p 8080:80 -p 2222:22 -v /data/docker/data/node.qcourse.cc:/data --name <b>myubuntu</b> --restart=always ubuntu:16.04 /bin/bash
    
 4) 列出所有的docker
    docker ps -a 
