@@ -25,3 +25,13 @@ apt-get -y install docker-ce
    # apt update
    # apt upgrade
    
+   安装软件
+   # apt install vim curl wget cron
+   
+   运行cron进程
+   # update-rc.d cron enable
+   # /etc/init.d/cron start
+   
+   安装mysql / nginx 
+   apt-get install nginx-extras mysql-server-5.7 mysql-client-5.7
+   
