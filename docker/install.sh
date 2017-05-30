@@ -35,3 +35,25 @@ apt-get -y install docker-ce
    安装mysql / nginx 
    apt-get install nginx-extras mysql-server-5.7 mysql-client-5.7
    
+5) 添加端口映射
+#!/bin/bash
+# Script: portmap.sh
+# Usage: <b>./portmap.sh</b>  8080  <b>myubuntu</b> 80
+
+[ $# -eq 3 ] || { 
+   echo "Usage: $0 host_port containerid container_port";
+   echo "       $0 85 myserver 80"; 
+   exit 1; 
+}
+  
+function portmap() {
+   host_port=$1
+   containerid=$2
+   container_port=$3
+
+   ip=$(docker inspect webserver2 | grep '\<IPAddress\>' | tail -1 | sed 's/"\|,\| //g' | awk -F: '{print $2}')
+   iptables -t nat -A  DOCKER -p tcp --dport 85 -j DNAT --to-destination $ip:80
+}
+
+portmap $1 $2 $3 
+#End of Script
