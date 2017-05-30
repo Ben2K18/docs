@@ -77,5 +77,7 @@ function portmap() {
    iptables -t nat -A  DOCKER -p tcp --dport 85 -j DNAT --to-destination $ip:80
 }
 
-portmap $1 $2 $3 
+portmap $1 $2 $3
+
+ufw allow $1
 #End of Script
