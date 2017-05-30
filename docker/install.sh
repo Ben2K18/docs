@@ -42,8 +42,20 @@ apt-get -y install docker-ce
    # update-rc.d cron enable
    # /etc/init.d/cron start
    
-   安装mysql / nginx 
-   apt-get install nginx-extras mysql-server-5.7 mysql-client-5.7
+   安装 
+   apt-get install vim curl wget elinks 
+   
+   #ssh
+   1) install
+   apt-get install openssh-server
+   
+   2) permit root
+   vim /etc/ssh/sshd_config.conf
+     PasswordAuthentication yes
+     PermitRootLogin yes
+     
+   3) restart
+   /etc/init.d/ssh restart
    
 6) 添加端口映射
 #!/bin/bash
