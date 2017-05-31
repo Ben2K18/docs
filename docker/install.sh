@@ -14,7 +14,7 @@ $ apt-get install docker-ce
    /etc/init.d/docker restart
 
 3) 创建一个ubuntu:16.04的名为myubuntu的docker, 挂载主机目录/data/docker/data/node.qcourse.cc为docker内/data
-   docker run -it -d -p 8080:80 -p 2222:22 -v /data/docker/data/node.qcourse.cc:/data --name <b>myubuntu</b> --restart=always ubuntu:16.04 /bin/bash
+   docker run -it -d -p 8080:80 -p 2222:22 -v /data/docker/data/node.qcourse.cc:/data -h myubuntu --name myubuntu --restart=always ubuntu:16.04 /bin/bash
    
    docker update --restart=no|unless-stopped|always myubuntu
    
@@ -28,7 +28,7 @@ $ apt-get install docker-ce
    docker rm $(docker ps -a -q)
    
 5) 进入docker
-   docker exec -it <b>myubuntu</b> bash
+   docker exec -it myubuntu bash
    
    更新docker内的软件
    # apt update
@@ -80,3 +80,16 @@ portmap $1 $2 $3
 
 ufw allow $1
 #End of Script
+
+7) 修改hostname
+   a) 停止myubuntu和docker服务
+   docker stop myubuntu
+   /etc/init.d/docker stop
+   
+   b)修改配置文件 
+   sed 's/"Hostname":"[^"]*"/"Hostname":"www-a-com"/g' /var/lib/docker/containers/d34..c2460/config.v2.json
+   
+   c) 启动myubuntu和docker服务
+   /etc/init.d/docker start
+   docker start myubuntu
+   
