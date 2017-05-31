@@ -1,0 +1,85 @@
+. apt update
+
+  1)install nginx
+    apt install nginx-extras openssl lua5.3
+  
+  2) intall php
+  apt install php-apigen   \
+php-ast   \
+php-auth   \
+php-console-commandline   \
+php-console-table   \
+php-email-validator   \
+php-fpdf   \
+php-gettext   \
+php-html-safe   \
+php-http   \
+php-http-webdav-server   \
+php-image-text   \
+php-imagick   \
+php-json   \
+php-memcache   \
+php-memcached   \
+php-mongodb   \
+php-mysql   \
+php-net-dns2   \
+php-net-ftp   \
+php-net-ipv4   \
+php-net-ipv6   \
+php-net-smtp   \
+php-net-socket   \
+php-net-url2   \
+php-pdfparser   \
+php-pear   \
+php-pecl-http   \
+php-readline   \
+php-sqlite3   \
+php-ssh2   \
+php-streams   \
+php-token-stream   \
+php-tokenreflection   \
+php-uuid   \
+php-validate   \
+php7.0   \
+php7.0-bcmath   \
+php7.0-bz2   \
+php7.0-cgi   \
+php7.0-cli   \
+php7.0-common   \
+php7.0-curl   \
+php7.0-dev   \
+php7.0-fpm   \
+php7.0-gd   \
+php7.0-json   \
+php7.0-mbstring   \
+php7.0-mcrypt   \
+php7.0-mysql   \
+php7.0-opcache   \
+php7.0-readline   \
+php7.0-sqlite3   \
+php7.0-sybase   \
+php7.0-xml   \
+php7.0-zip   \
+phpqrcode   \
+phpreports   \
+phpsysinfo   \
+phpunit   \
+phpunit-code-unit-reverse-lookup   \
+phpunit-comparator   \
+phpunit-dbunit   \
+phpunit-diff   \
+phpunit-environment   \
+phpunit-exporter   \
+phpunit-git   \
+phpunit-global-state   \
+phpunit-mock-object   \
+phpunit-object-enumerator   \
+phpunit-recursion-context   \
+phpunit-resource-operations   \
+phpunit-version   \
+phpwebcounter
+
+  3) install mysql
+     apt install mysql-server-5.7 mysql-client-5.7
+     
+.configure
