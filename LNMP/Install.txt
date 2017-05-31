@@ -1,4 +1,5 @@
 . apt update
+  apt upgrade
 
   1)install nginx
     apt install nginx-extras openssl lua5.3
