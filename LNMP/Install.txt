@@ -84,3 +84,228 @@ phpwebcounter
      apt install mysql-server-5.7 mysql-client-5.7
      
 .configure
+ 1) nginx
+    a) default server
+       server {
+                listen 80  default_server;
+                server_name  _; 
+                return 403;
+       }
+    
+    b) authentication
+       .创建密码
+       $ printf "username:$(openssl passwd -crypt password)\n"  > /tmp/passwd
+
+       server {
+             location /  {
+                     auth_basic "nginx basic http test for ttlsa.com";
+                     auth_basic_user_file /tmp/passwd; 
+             }
+       }             
+
+      .
+       输入: username
+       密码: password
+
+     c) favicon.ico
+        location = /favicon.ico {
+            log_not_found off;
+            access_log off;
+        }
+
+     d) user-agent
+        if ($http_user_agent ~* (wget|curl) ) {
+             return 404;
+        }
+        
+     e) server name
+        server {
+                server_name ~^(www\.)?c.com$ ~^(www\.)?d.com$;
+            
+                if ( $host !~ ^www\. ) {
+                    return 301 http://www.$host$request_uri;
+                }
+         }
+         
+      f) ajax跨域
+         AJAX从一个域请求另一个域会有跨域的问题。
+         要在nginx上启用跨域请求，需要添加add_header Access-Control*指令。如下所示：
+
+         location / {
+                      add_header 'Access-Control-Allow-Origin' 'http://other.subdomain.com';
+                      add_header 'Access-Control-Allow-Credentials' 'true';
+                      add_header 'Access-Control-Allow-Methods' 'GET';
+         }
+
+         注释如下：
+         第一条指令：授权从other.subdomain.com的请求
+         第二条指令：当该标志为真时，响应于该请求是否可以被暴露
+         第三天指令：指定请求的方法，可以是GET，POST等
+         如果需要允许来自任何域的访问，可以这样配置：
+         Access-Control-Allow-Origin: * 
+
+         成功时，响应头是如下所示：
+         Access-Control-Allow-Origin: other.subdomain.com
+         
+     g) expires
+        location ~* \.(js|css|jpg|jpeg|gif|png|swf)$ {
+             if (-f $request_filename) {
+                  access_log off;
+                  expires 1h;
+                  break;
+             }
+        }
+
+        # cache.appcache, your document html and data
+        location ~* \.(?:manifest|appcache|html?|xml|json)$ {
+             expires -1;
+        }
+
+        # Feed
+        location ~* \.(?:rss|atom)$ {
+             expires 1h;
+             add_header Cache-Control "public";
+        }
+
+        # Media: images, icons, video, audio, HTC
+        location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+            expires 1M;
+            access_log off;
+            add_header Cache-Control "public";
+        }
+
+        # CSS and Javascript
+        location ~* \.(?:css|js)$ {
+           expires 1y;
+           access_log off;
+           add_header Cache-Control "public";
+        }
+        
+     h) error_page
+        error_page  404  /404.html;
+        error_page 404 =301  http://www.a.com/404.html;
+        
+     i) header
+        proxy_set_header Host $host;
+        add_header gzip_ratio "gzip_ratio";
+
+        add_header X-Accel-Expires 10800;
+        add_header Cache-Control 'max-age=10800';
+
+        #忽略Set-Cookie头
+        proxy_ignore_headers Cache-Control Set-Cookie;
+        proxy_ignore_headers Cache-Control Set-Cookie Vary;
+        
+     j) htaccess
+        location ~/\.ht {
+           deny all;
+        }
+        
+        
+     k) if..else
+        server {
+                 #not allow ip , can not access the uri
+                 if ( $uri ~* "^/admin" ) {
+                        set $allowip 1;
+                 }
+
+                 if ( $remote_addr !~* "^(1.1.1.1|2.2.2.2)" ) {
+                        set $allowip 1$allowip;
+                 }
+
+                 if ( $query_string ~* "^key=passwd" ) {
+                        add_header Set-Cookie cookp=passwded;
+                        set $allowip 1;
+                 }
+
+                 if ( $http_cookie ~* "cookp=passwded" ) {
+                        set $allowip 1;
+                 }
+
+                 if ( $allowip = 11 )
+                 {
+                    return 404;
+                 }
+                 #~not allow ip , can not access the uri                
+         }
+         
+      m) https
+         http
+         {
+             server
+             {
+                 listen 443;
+       
+                 server_name abc.com www.abc.com;
+      
+                 # HSTS
+                 #保护客户端从HTTP拦截，从它看到STS头部到声明的max-age的期间内。然而，
+                 #HSTS并不是HTTP回话劫持的完美解决方案。用户仍然容易受到攻击：
+                 add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+       
+                 listen 443 ssl;
+                 ssl on;
+                 ssl_certificate        /etc/nginx/ssl/a.com.crt;
+                 ssl_certificate_key /etc/nginx/ssl/a.com.key;
+                 ssl_protocols        TLSv1 TLSv1.1 TLSv1.2;
+                 ssl_ciphers           HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+                 ssl_prefer_server_ciphers on;
+                 ssl_session_cache  builtin:1000  shared:SSL:10m;    
+                 ssl_session_timeout  5m;
+                 
+                 root html;
+                 location / {
+                       ....
+                 }
+             }
+
+             server 
+             {
+	              listen 80;
+                server name abc.com www.abc.com;
+                rewrite ^(.*)$  https://www.abc.com$1 permanent;
+             }
+         }
+         
+         
+     n) mp3/mp4
+             location ~ \.(mp3|mp4) {
+                   root  /www/media;
+             }
+        
+             location /mp3 {
+                   sendfile on;
+                   sendfile_max_chunk  1m;
+                   tcp_nopush on;
+             
+                   tcp_nodelay  on;
+                   keepalive_timeout  65;
+             }
+             
+        o) realip
+           http {
+                    #删除以下IP,然后后端得到的X-Forwarded-For IP才是真实IP
+                    set_real_ip_from 1.1.1.1;
+                    set_real_ip_from 2.2.2.2;
+                    set_real_ip_from 192.168.1.0/24;
+        
+                    real_ip_header X-Forwarded-For;
+                    real_ip_recursive on;
+           }
+           
+           .access.log
+            log_format main  ... ip="$remote_addr" ...;
+
+           .php:
+            $_SERVER['REMOTE_ADDR'];
+            
+       p) 防盗链
+          location ~* \.(gif|jpg|swf)$ {
+               #合法的来源域名
+               valid_referers none blocked a.com google.com baidu.com so.com;
+ 
+               #其它域名以外的域名则跳转到指定图片
+               if ($invalid_referer) {
+                     rewrite ^/ http://$host/logo.png;
+               }
+          }
