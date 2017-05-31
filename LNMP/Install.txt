@@ -1,17 +1,16 @@
-. apt update
-  apt upgrade
+.
+apt update
+apt upgrade
 
-  1)install nginx
+1)install nginx
     apt install nginx-extras openssl lua5.3
   
-  2) intall php
+2) intall php
   apt install php-apigen   \
 php-ast   \
 php-auth   \
 php-console-commandline   \
 php-console-table   \
-php-email-validator   \
-php-fpdf   \
 php-gettext   \
 php-html-safe   \
 php-http   \
@@ -58,41 +57,60 @@ php7.0-mysql   \
 php7.0-opcache   \
 php7.0-readline   \
 php7.0-sqlite3   \
-php7.0-sybase   \
 php7.0-xml   \
 php7.0-zip   \
 phpqrcode   \
 phpreports   \
-phpsysinfo   \
 phpunit   \
-phpunit-code-unit-reverse-lookup   \
-phpunit-comparator   \
-phpunit-dbunit   \
-phpunit-diff   \
-phpunit-environment   \
-phpunit-exporter   \
-phpunit-git   \
-phpunit-global-state   \
-phpunit-mock-object   \
-phpunit-object-enumerator   \
-phpunit-recursion-context   \
-phpunit-resource-operations   \
-phpunit-version   \
 phpwebcounter
 
-  3) install mysql
-     apt install mysql-server-5.7 mysql-client-5.7
+3) install mysql
+   apt install mysql-server-5.7 mysql-client-5.7
+     
      
 .configure
- 1) nginx
-    a) default server
+
+1) nginx
+a) io优化 /etc/fstab
+   /dev/sdb1  /data  ext4  defaults,nosuid,noexec,nodev,noatime 0 0
+ 
+0) nginx.conf
+    user nginx;
+    worker_processes 8;
+    server_names_hash_max_size 1024;
+    server_name_hash_bucket_size 32/64/128;
+    server_tokens off;
+    
+    events {
+        use epoll;
+	worker_connections 1024;
+	multi_accept on;
+    }
+    
+    # /etc/security/limits.conf  * - nofile 65535;
+    worker_rlimit_nofile 20000;  
+    
+    http {
+         sendfile on;
+	 tcp_nodelay on;
+	 
+	 keepalive_timeout 65;	 
+	 send_timeout 60;
+	 
+	 client_max_body_size 30m;
+	 client_body_timeout 60;
+	 client_header_timeout 60;
+	 ...
+    }
+    
+a) default server
        server {
                 listen 80  default_server;
                 server_name  _; 
                 return 403;
        }
     
-    b) authentication
+b) authentication
        .创建密码
        $ printf "username:$(openssl passwd -crypt password)\n"  > /tmp/passwd
 
@@ -107,18 +125,18 @@ phpwebcounter
        输入: username
        密码: password
 
-     c) favicon.ico
+c) favicon.ico
         location = /favicon.ico {
             log_not_found off;
             access_log off;
         }
 
-     d) user-agent
+d) user-agent
         if ($http_user_agent ~* (wget|curl) ) {
              return 404;
         }
         
-     e) server name
+e) server name
         server {
                 server_name ~^(www\.)?c.com$ ~^(www\.)?d.com$;
             
@@ -127,7 +145,7 @@ phpwebcounter
                 }
          }
          
-      f) ajax跨域
+f) ajax跨域
          AJAX从一个域请求另一个域会有跨域的问题。
          要在nginx上启用跨域请求，需要添加add_header Access-Control*指令。如下所示：
 
@@ -147,7 +165,7 @@ phpwebcounter
          成功时，响应头是如下所示：
          Access-Control-Allow-Origin: other.subdomain.com
          
-     g) expires
+g) expires
         location ~* \.(js|css|jpg|jpeg|gif|png|swf)$ {
              if (-f $request_filename) {
                   access_log off;
@@ -181,11 +199,11 @@ phpwebcounter
            add_header Cache-Control "public";
         }
         
-     h) error_page
+h) error_page
         error_page  404  /404.html;
         error_page 404 =301  http://www.a.com/404.html;
         
-     i) header
+i) header
         proxy_set_header Host $host;
         add_header gzip_ratio "gzip_ratio";
 
@@ -196,13 +214,13 @@ phpwebcounter
         proxy_ignore_headers Cache-Control Set-Cookie;
         proxy_ignore_headers Cache-Control Set-Cookie Vary;
         
-     j) htaccess
+j) htaccess
         location ~/\.ht {
            deny all;
         }
         
         
-     k) if..else
+k) if..else
         server {
                  #not allow ip , can not access the uri
                  if ( $uri ~* "^/admin" ) {
@@ -229,7 +247,7 @@ phpwebcounter
                  #~not allow ip , can not access the uri                
          }
          
-      m) https
+m) https
          http
          {
              server
@@ -268,7 +286,7 @@ phpwebcounter
          }
          
          
-     n) mp3/mp4
+n) mp3/mp4
              location ~ \.(mp3|mp4) {
                    root  /www/media;
              }
@@ -281,8 +299,21 @@ phpwebcounter
                    tcp_nodelay  on;
                    keepalive_timeout  65;
              }
+	     
+     location /flv/ {
+              flv;
+              limit_rate_after 500k;
+              limit_rate 50k;
+     } 
+     
+     location /video/ {
+             sendfile on;
+             tcp_nopush on;
+             aio on;
+     }
+     
              
-        o) realip
+o) realip
            http {
                     #删除以下IP,然后后端得到的X-Forwarded-For IP才是真实IP
                     set_real_ip_from 1.1.1.1;
@@ -299,7 +330,7 @@ phpwebcounter
            .php:
             $_SERVER['REMOTE_ADDR'];
             
-       p) 防盗链
+p) 防盗链
           location ~* \.(gif|jpg|swf)$ {
                #合法的来源域名
                valid_referers none blocked a.com google.com baidu.com so.com;
@@ -308,4 +339,351 @@ phpwebcounter
                if ($invalid_referer) {
                      rewrite ^/ http://$host/logo.png;
                }
-          }
+           }
+	  
+q) php
+	   location ~ \.php$ {
+                fastcgi_pass    127.0.0.1:9002;
+                fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+                include  fastcgi_params;
+           }
+
+r) mono .net
+ $ sudo apt-get install mono-fastcgi-server mono-fpm-server  
+ $ sudo mkdir /var/www/html/www.a.com 
+ $ sudo vim /etc/init.d/nginx  添加如下一行
+  
+   nc -w 1 127.0.0.1 9000  || ( /usr/bin/fastcgi-mono-server4 /socket=tcp:127.0.0.1:9000 /applications=/:/data/www/htdocs/front.a.com/ & )
+
+ $ sudo  vim /etc/nginx/site-enabled/www.a.com 
+ server {
+    listen 80;
+    server_name www.a.com;
+
+    root /var/www/html/www.a.com;
+    
+    #.aspx
+    location ~ \.aspx$ {
+        proxy_set_header Host $host;
+        include /etc/nginx/fastcgi_params;
+        fastcgi_param  PATH_INFO  "";
+	fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        fastcgi_pass 127.0.0.1:9000;
+       	fastcgi_index /;
+        #fastcgi_index index.aspx;
+    }
+    
+    #mvc
+    location / {
+	 proxy_set_header Host $host;
+         include /etc/nginx/fastcgi_params;
+	 fastcgi_param  PATH_INFO  "";
+	 fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+         fastcgi_pass 127.0.0.1:9001;
+	 fastcgi_index /;
+         #fastcgi_index index.aspx;
+    }
+}
+
+$ sudo vim /var/www/html/www.a.com/test.aspx
+<%@ Page Language="C#" AutoEventWireup="true" %>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+</head>
+<body>
+    <div>
+    <% var test = String.Format("Hello World! Got an aspx page running on nginx!!!\r\n{0}",System.DateTime.Now); %>
+    <%= test %>
+    </div>
+</body>
+</html>
+
+$ lynx http://www.a.com/test.aspx
+
+    s) proxy pass
+       location /some/path/ {
+           proxy_pass  http://www.a.com/link/;
+       }
+
+       location /some/path/ {
+           proxy_set_header  Host  $host;
+           proxy_set_header  X-Real-IP $remote_addr;
+           proxy_set_header Accept-Encoding "";
+        
+           proxy_buffering off;
+           proxy_buffers  16  4k;
+           proxy_buffer_size 2k;
+           proxy_pass  http://localhost:8000;
+       }
+
+    t) proxy hidden domain name
+       upstream www-a.com {
+	   server 8.2.7.33:8080;
+       }
+
+       server
+       {
+            listen  80;
+            server_name  www.b.com b.com;
+
+            location /
+            {
+                proxy_redirect off;
+		proxy_set_header  X-Real-IP  $remote_addr;
+		proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+                #重点Host, 让后端以为访问的是www.a.com
+	        proxy_set_header Host www.a.com;
+                proxy_pass http://www-a-com;
+            }
+         }
+
+u) websocket
+
+map $http_upgrade $connection_upgrade {
+     default upgrade;
+     ''    close;
+}      
+
+upstream www-a.com {
+     server 8.2.7.33:8080;
+}
+	 
+location / {
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+	proxy_connect_timeout 600;
+	proxy_read_timeout 600;
+	proxy_send_timeout 600;
+	proxy_buffer_size 32k;
+	proxy_buffers 4 32k;
+
+	proxy_busy_buffers_size 64k;
+	proxy_temp_file_write_size 1024m;
+	proxy_ignore_client_abort on;	
+		
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+		
+        proxy_pass http://chat-a.com;
+}
+	  
+v) rewrite
+server {
+        if ( $host !~ ^www\. ) {
+             return 301 http://www.$host$request_uri;
+        }
+}
+
+server {
+        server_name  a.com  www.a.com;
+        server_name  ~^(www\.)?b.com;
+        
+        set $sname "a.com";
+        if ( $host = $sname ) {
+             return 301 http://www.$host$request_uri;
+        }
+}
+
+server {
+  listen 80;
+  rewrite ^(/users/\w+)$ https://$host$1 permanent;
+}
+
+if ($request_uri !~ "^/users/\w+$")
+{
+  return 301 https://$host$request_uri;
+}
+
+if ($http_user_agent ~ MSIE) {
+    rewrite ^(.*)$ /msie/$1 break;
+}
+
+if ($http_cookie ~* "id=([^;]+)(?:;|$)") {
+    set $id $1;
+}
+
+if ($request_method = POST) {
+    return 405;
+}
+
+if ($slow) {
+    limit_rate 10k;
+}
+
+if ($invalid_referer) {
+    return 403;
+}
+
+server {
+    ...
+    rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 last;
+    rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;
+    return  403;
+    ...
+}
+ 
+location /download/ {
+    rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 break;
+    rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  break;
+    return  403;
+}
+
+rewrite ^/users/(.*)$ /show?user=$1? last;
+
+location /download/ {
+    if ($forbidden) {
+        return 403;
+    }
+
+    if ($slow) {
+        limit_rate 10k;
+    }
+
+    rewrite ^/(download/.*)/media/(.*)\..*$ /$1/mp3/$2.mp3 break;
+}
+
+
+w) sub_filter, 字符串替换
+location / {
+    sub_filter /blog/ /blog-staging/;
+    sub_filter_once off;
+}
+
+location / {
+    sub_filter 'href="http://127.0.0.1:8080/'  'href="http://$host/';
+    sub_filter 'img src="http://127.0.0.1:8080/' 'img src="http://$host/';
+    sub_filter_once on;
+}
+location /users/ {
+    rewrite ^/users/(.*)$  /show.php?uid=$1 break;
+}
+
+server {
+    rewrite ^(/download/.*)/media/(.*)\..*$  $1/mp3/$2.mp3 last;
+    rewrite ^(/download/.*)/audio/(.*)\..*$  $1/mp3/$2.ra last;
+}
+
+x) upstream
+proxy_next_upstream http_502 http_504 http_404 error timeout invalid_header;
+
+upstream a-com {
+      ip_hash;
+      server 8.8.8.5:80 max_fails=1 fail_timeout=3s weight=5 ;
+      server 8.8.8.6:80  max_fails=1 fail_timeout=3s backup|down|  max_fails=3 fail_timeout=30s|keepalive 32; ;
+}
+
+upstream a-com {
+       server 8.8.8.5:80 max_fails=1 fail_timeout=3s;        
+       server 8.8.8.6:80 max_fails=1 fail_timeout=3s backup;
+}
+
+y) status
+server {
+           location ~ ^/NginxStatus/ {
+                stub_status on;
+                access_log off;
+                allow 122.152.166.126;
+                allow 116.50.179.64/29;
+                deny all;
+           }       
+}
+
+z) 内核修改
+.修改文件数
+ulimit -SHn 500000
+sed -i  '/End/ i  *  -   nofile 500000' /etc/security/limits.conf
+sed -i '/end of pam-auth-update/ i session required pam_limits.so' /etc/pam.d/common-session 
+echo  session    required   pam_limits.so >> /etc/pam.d/su
+sed -i '$ a ulimit -SHn 500000' /etc/profile
+  
+cat >> /etc/sysctl.conf  <<_EOF_
+net.ipv4.tcp_tw_recycle = 1
+net.ipv4.tcp_tw_reuse = 1 
+net.ipv4.tcp_syn_retries = 2
+net.ipv4.tcp_synack_retries = 2
+net.ipv4.tcp_keepalive_time = 60
+net.ipv4.tcp_fin_timeout = 30
+
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_orphans = 262144
+net.ipv4.tcp_max_syn_backlog = 262144
+net.ipv4.tcp_timestamps = 0
+net.ipv4.ip_local_port_range = 1024 65000
+net.core.somaxconn = 262144
+net.core.netdev_max_backlog = 262144
+_EOF_
+
+///////////////////////////////////////////////////////////////////////
+
+#启用timewait快速回收
+net.ipv4.tcp_tw_recycle = 1
+
+#开启timewait重新使用
+net.ipv4.tcp_tw_reuse = 1
+
+#当SYN等待队列溢出时使用Cookies来处理(默认为1)
+net.ipv4.tcp_syncookies = 1
+
+#默认65536
+net.ipv4.tcp_max_orphans = 262144
+
+#记录尚未收到客户端确认信息的连接请求的最大值(默认为512)
+net.ipv4.tcp_max_syn_backlog = 262144
+
+#默认1
+net.ipv4.tcp_timestamps = 0
+
+#内核向客户端发送SYN ACK的重试次数（默认5）
+net.ipv4.tcp_synack_retries = 1
+
+#内核放弃建立连接之前发送SYN包的次数 （默认6）
+net.ipv4.tcp_syn_retries = 1
+
+#连接保持在FIN-WAIT-2状态多长时间后，本端关闭连接, 对端可能永远不关闭连接
+net.ipv4.tcp_fin_timeout = 1
+
+#默认60
+net.ipv4.tcp_keepalive_time = 30
+
+#默认 32768	61000
+net.ipv4.ip_local_port_range = 1024 65000
+
+#默认128
+net.core.somaxconn = 262144
+
+#默认1000
+#网卡接收速率比内核处理速度快时，把数据包放入队列，默认300
+net.core.netdev_max_backlog = 262144
+
+
+a)限制单IP访问次数
+http {
+           limit_req_zone $binary_remote_addr zone=perip:10m rate=59r/s; 
+           server {
+                location /search/ {
+                    limit_req zone=perip burst=100 [nodelay];
+                }
+            }  
+}
+
+
+b) allow deny
+
+location ~ ^/attachements/.*\.(php|php5|php4|sh|pl|py)$ {
+    deny all;
+}
+
+if ( $request_method !~ ^(GET|HEAD|POST)$ ) {
+    deny all;
+}
+
+location ~ ^/admin/ {
+    allow x.x.x.x;
+    deny all;
+}
+
+
