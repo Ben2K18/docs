@@ -1,0 +1,22 @@
+[root@localhost: ~]# git clone https://github.com/kshcherban/acme-nginx
+[root@localhost: ~]# cd acme-nginx
+[root@localhost: ~]# python setup.py install
+
+[root@localhost: ~]# acme-nginx -d redlinux.org -d www.redlinux.org
+
+[root@localhost: ~]# vim /etc/nginx/site-enabled/www.redlinux.org
+server {
+     ...
+     listen 443 ssl;
+     ssl on;
+     ssl_certificate /etc/ssl/private/letsencrypt-domain.pem;
+     ssl_certificate_key /etc/ssl/private/letsencrypt-domain.key;
+     ssl_protocols   TLSv1 TLSv1.1 TLSv1.2;
+     ssl_ciphers     HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+     ssl_prefer_server_ciphers on;
+     ssl_session_cache  builtin:1000  shared:SSL:10m;
+     ...
+}
+
+#定时更新 crontab 每月1号更新一次
+0 0 1 * * root /usr/local/bin/acme-nginx -d redlinux.org -d www.redlinux.org
