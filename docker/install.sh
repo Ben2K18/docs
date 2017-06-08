@@ -72,8 +72,15 @@ function portmap() {
    containerid=$2
    container_port=$3
 
-   ip=$(docker inspect webserver2 | grep '\<IPAddress\>' | tail -1 | sed 's/"\|,\| //g' | awk -F: '{print $2}')
-   iptables -t nat -A  DOCKER -p tcp --dport 85 -j DNAT --to-destination $ip:80
+   ip=$(docker inspect webserver2 | grep '\<IPAddress\>' | tail -1 | sed 's/"\|,\| //g' | awk -F: '{print $2}')    
+   
+   /sbin/iptables -A DOCKER -d $ip/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport $host_port -j ACCEPT
+   /sbin/iptables -t nat  -A POSTROUTING -s $ip/32 -d $ip/32 -p tcp -m tcp --dport $host_port -j MASQUERADE
+   /sbin/iptables -t nat -A DOCKER ! -i docker0 -p tcp -m tcp --dport $host_port -j DNAT --to-destination $ip:$container_port
+
+   #/sbin/iptables -A DOCKER -d 172.17.0.2/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport 443 -j ACCEPT
+   #/sbin/iptables -t nat  -A POSTROUTING -s 172.17.0.2/32 -d 172.17.0.2/32 -p tcp -m tcp --dport 443 -j MASQUERADE
+   #/sbin/iptables -t nat -A DOCKER ! -i docker0 -p tcp -m tcp --dport 443 -j DNAT --to-destination 172.17.0.2:443
 }
 
 portmap $1 $2 $3
