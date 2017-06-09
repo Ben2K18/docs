@@ -210,18 +210,18 @@ server {
             access_log off;
          }
 		 
-		 location ~ robots$ {
+	 location ~ robots$ {
             log_not_found off;
             access_log off;
          }
 		
          location / {
              ...
-	         #跨域ajax调用
+	     #跨域ajax调用
              #add_header Access-Control-Allow-Origin *;
 	
-	         #iframe
-	         #add_header X-Frame-Options DENY;
+	     #iframe
+	     #add_header X-Frame-Options DENY;
              add_header X-Frame-Options SAMEORIGIN; 
         
              #禁止服务器自动解析资源类型
@@ -231,7 +231,6 @@ server {
              add_header X-Xss-Protection 1;	
 	         ...
          }
-
 } 
 
 .) php
@@ -302,7 +301,6 @@ http {
 
          real_ip_header X-Forwarded-For;
          real_ip_recursive on;
-
            
          #access.log
          log_format main  ... ip="$remote_addr" ...;
@@ -380,9 +378,9 @@ server {
 .) ajax跨域 
 server {
          location / {
-		     #add_header Access-Control-Allow-Origin: * ;
+	     #add_header Access-Control-Allow-Origin: * ;
              add_header 'Access-Control-Allow-Origin' 'http://other.subdomain.com';
-			 #当该标志为真时，响应于该请求是否可以被暴露
+	     #当该标志为真时，响应于该请求是否可以被暴露
              add_header 'Access-Control-Allow-Credentials' 'true';
              add_header 'Access-Control-Allow-Methods' 'GET,POST';
          }
@@ -548,7 +546,7 @@ server {
         proxy_set_header Host $host;
         include /etc/nginx/fastcgi_params;
         fastcgi_param  PATH_INFO  "";
-	    fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+	fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
         fastcgi_pass 127.0.0.1:9000;
        	fastcgi_index /;
         #fastcgi_index index.aspx;
@@ -556,12 +554,12 @@ server {
     
     #mvc
     location / {
-	     proxy_set_header Host $host;
+	 proxy_set_header Host $host;
          include /etc/nginx/fastcgi_params;
-	     fastcgi_param  PATH_INFO  "";
-	     fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+	 fastcgi_param  PATH_INFO  "";
+	 fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
          fastcgi_pass 127.0.0.1:9001;
-	     fastcgi_index /;
+	 fastcgi_index /;
          #fastcgi_index index.aspx;
     }
 }
@@ -597,7 +595,7 @@ server
      location /
      {
          proxy_redirect off;
-	     proxy_set_header  X-Real-IP  $remote_addr;
+	 proxy_set_header  X-Real-IP  $remote_addr;
          proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
          #重点Host, 让后端以为访问的是www.a.com
          proxy_set_header Host www.a.com;
@@ -619,19 +617,19 @@ upstream www-a.com {
 server {
 	 
           location / {
-          	      proxy_set_header Host $host;
-          	      proxy_set_header X-Real-IP $remote_addr;
-          	      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          	  proxy_set_header Host $host;
+          	  proxy_set_header X-Real-IP $remote_addr;
+          	  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                   
-          	      proxy_connect_timeout 600;
-          	      proxy_read_timeout 600;
-          	      proxy_send_timeout 600;
-          	      proxy_buffer_size 32k;
-          	      proxy_buffers 4 32k;
+          	  proxy_connect_timeout 600;
+          	  proxy_read_timeout 600;
+          	  proxy_send_timeout 600;
+          	  proxy_buffer_size 32k;
+          	  proxy_buffers 4 32k;
                   
-          	      proxy_busy_buffers_size 64k;
-          	      proxy_temp_file_write_size 1024m;
-          	      proxy_ignore_client_abort on;	
+          	  proxy_busy_buffers_size 64k;
+          	  proxy_temp_file_write_size 1024m;
+          	  proxy_ignore_client_abort on;	
           		
                   proxy_http_version 1.1;
                   proxy_set_header Upgrade $http_upgrade;
@@ -727,18 +725,18 @@ server {
 .) sub_filter, 字符串替换
 server {
           location / {
-                       sub_filter /blog/ /blog-staging/;
-                       sub_filter_once off;
+               sub_filter /blog/ /blog-staging/;
+               sub_filter_once off;
           }
 
           location / {
-                       sub_filter 'href="http://127.0.0.1:8080/'  'href="http://$host/';
-                       sub_filter 'img src="http://127.0.0.1:8080/' 'img src="http://$host/';
-                       sub_filter_once on;
+                sub_filter 'href="http://127.0.0.1:8080/'  'href="http://$host/';
+                sub_filter 'img src="http://127.0.0.1:8080/' 'img src="http://$host/';
+                sub_filter_once on;
           }
 	  
           location /users/ {
-                       rewrite ^/users/(.*)$  /show.php?uid=$1 break;
+                rewrite ^/users/(.*)$  /show.php?uid=$1 break;
           }
 }
 
