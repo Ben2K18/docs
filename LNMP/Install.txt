@@ -251,37 +251,50 @@ m) https
          http
          {
              server
-             {
-                 listen 443;
-       
-                 server_name abc.com www.abc.com;
-      
-                 # HSTS
-                 #保护客户端从HTTP拦截，从它看到STS头部到声明的max-age的期间内。然而，
-                 #HSTS并不是HTTP回话劫持的完美解决方案。用户仍然容易受到攻击：
-                 add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-       
-                 listen 443 ssl;
+             { 		 
+                 server_name a.com www.a.com;
+	
                  ssl on;
-                 ssl_certificate        /etc/nginx/ssl/a.com.crt;
-                 ssl_certificate_key /etc/nginx/ssl/a.com.key;
-                 ssl_protocols        TLSv1 TLSv1.1 TLSv1.2;
-                 ssl_ciphers           HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
-                 ssl_prefer_server_ciphers on;
-                 ssl_session_cache  builtin:1000  shared:SSL:10m;    
-                 ssl_session_timeout  5m;
-                 
-                 root html;
-                 location / {
-                       ....
-                 }
-             }
+		 listen 80;
+                 listen 443 ssl;
 
-             server 
-             {
-	              listen 80;
-                server name abc.com www.abc.com;
-                rewrite ^(.*)$  https://www.abc.com$1 permanent;
+                 ssl_certificate     /etc/nginx/ssl/a.com.crt;
+                 ssl_certificate_key /etc/nginx/ssl/a.com.key;
+		 
+                 ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+	         ssl_ciphers         HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+	         ssl_session_cache   builtin:1000  shared:SSL:10m; 
+		 ssl_session_timeout 5m;
+
+                 #HSTS策略
+	         #保护客户端从HTTP拦截，从它看到STS头部到声明的max-age的期间内。
+                 add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+                 #优先采取服务器算法
+                 ssl_prefer_server_ciphers on;
+
+                 #减少点击劫持
+                 add_header X-Frame-Options DENY;
+
+                 #禁止服务器自动解析资源类型
+                 add_header X-Content-Type-Options nosniff;
+
+                 #防XSS攻擊
+                 add_header X-Xss-Protection 1;
+
+                if ( $host !~ ^www\. ) {
+                    return 301 https://www.$host$request_uri;
+                }
+
+                if (  $scheme ~ http$ )
+                {
+                    return 301 https://$host$request_uri;
+                } 
+                 
+                root html;
+                location / {
+                       ....
+                }
              }
          }
          
