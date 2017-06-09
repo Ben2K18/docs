@@ -243,7 +243,10 @@ server {
 }
 
 .) https
+a) 生成 dhparam.pem
+ $ openssl dhparam -out /etc/nginx/ssl/dhparam.pem 
  
+b) 配置 
 server
 { 		 
     server_name a.com www.a.com;
@@ -252,11 +255,13 @@ server
     listen 80;
     listen 443 ssl;
     
+    ssl_dhparam ssl/dhparam.pem;
     ssl_certificate     /etc/nginx/ssl/a.com.crt;
     ssl_certificate_key /etc/nginx/ssl/a.com.key;
 
     ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
     #ssl_ciphers         HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+    
     ssl_ciphers "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !RC4";
     ssl_session_cache   builtin:1000  shared:SSL:10m; 
     ssl_session_timeout 5m;
