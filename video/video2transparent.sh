@@ -25,14 +25,15 @@ _EOF_
 src=$1
 bgc=${2:-white}
 fuzz=${3:-30}
-fname=${$(basename $src)%.*}
+fname=$(basename $src)
+fname=${fname%.*}
 
 #install ffmpeg and imagemagick (for convert)
 [ -f /usr/bin/ffmpeg ]  || apt install ffmpeg
 [ -f /usr/bin/convert ] || apt install imagemagick 
 
 #convert directory
-[ -f /tmp/videotrans ] || mkdir /tmp/videotrans
+[ -d /tmp/videotrans ] || mkdir /tmp/videotrans
 
 cd /tmp/videotrans
 
