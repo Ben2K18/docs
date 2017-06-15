@@ -6,8 +6,7 @@
 
 #usage
 function usage() {
-   cat <<_EOF_
-Usage: 
+   cat <<_EOF_ 
 Usage: 
       $ $0 a.mp4 bgcolor color-relate-range
       $ $0 a.mp4 4fff87 10
