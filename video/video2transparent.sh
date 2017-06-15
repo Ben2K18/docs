@@ -1,7 +1,16 @@
 #!/bin/bash
+#
 # Convert video to transparent webm
+# Script: video2trans.sh
 # Author: cnscn <http://www.redlinux.org>
 # Date: 20170615
+#
+# apt install gcc shc
+#
+# convert sh to executable file
+# shc -f video2trans.sh
+# ls -l  video2trans.sh.x
+# mv video2trans.sh.x video2trans
 #
 
 #usage
