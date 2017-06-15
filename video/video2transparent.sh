@@ -19,7 +19,6 @@ _EOF_
 }
 usage
 
-
 #args
 [ $# -eq 3 ] || usage
 [ -f $1 ] || usage
