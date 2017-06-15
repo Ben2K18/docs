@@ -12,7 +12,7 @@ Usage:
       $ $0 a.mp4 4fff87 10
     
       $ ls /tmp/videotrans/*
-        ab.mp4 ab.webm mp3 png
+        result.webm mp3 png
 _EOF_
 
    exit
@@ -25,7 +25,7 @@ _EOF_
 src=$1
 bgc=${2:-white}
 fuzz=${3:-30}
-fname=${src%.*}
+fname=${$(basename $src)%.*}
 
 #install ffmpeg and imagemagick (for convert)
 [ -f /usr/bin/ffmpeg ]  || apt install ffmpeg
@@ -34,19 +34,18 @@ fname=${src%.*}
 #convert directory
 [ -f /tmp/videotrans ] || mkdir /tmp/videotrans
 
-cp $src /tmp/videotrans
 cd /tmp/videotrans
 
 [ -d png ] || mkdir png ; [ -d mp3 ] || mkdir mp3 ; rm -f png/* ; rm -f mp3/*
 
 #extract audio from video
-ffmpeg -i ab.mp4 -q:a 0 -map a mp3/${fname}.mp3
+ffmpeg -i $src -q:a 0 -map a mp3/${fname}.mp3
 
 #extract png from video
 ffmpeg -i $src -f image2 png/2\%d.png
 
 #get rate from video
-rate=$(ffmpeg -i ab.mp4 2>&1 | sed -n "s/.*, \(.*\) fp.*/\1/p")
+rate=$(ffmpeg -i $src 2>&1 | sed -n "s/.*, \(.*\) fp.*/\1/p")
 
 #png to transparent
 cd png
