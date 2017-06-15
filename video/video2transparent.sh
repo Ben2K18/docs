@@ -1,5 +1,5 @@
 #!/bin/bash
-# Convert mp4 to transparent webm
+# Convert video to transparent webm
 # Date: 20170615
 
 #usage
