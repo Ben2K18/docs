@@ -1,5 +1,6 @@
 #!/bin/bash
 # Convert video to transparent webm
+# Author: cnscn <http://www.redlinux.org>
 # Date: 20170615
 #
 
