@@ -1,13 +1,23 @@
 #!/bin/bash
 # Convert video to transparent webm
 # Date: 20170615
+#
 
 #usage
 function usage() {
-   echo "Usage: $0 a.mp4 bgcolor color-relate-range"
-   echo "       $0 a.mp4 4fff87 10"
+   cat <<_EOF_
+Usage: 
+  $0 a.mp4 bgcolor color-relate-range
+  $0 a.mp4 4fff87 10
+
+  $ ls /tmp/videotrans/*
+    ab.mp4 ab.webm mp3 png
+_EOF_
+
    exit
 }
+usage
+
 
 #args
 [ $# -eq 3 ] || usage
