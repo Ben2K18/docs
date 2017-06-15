@@ -1,0 +1,40 @@
+
+1) HTML5 Video + Audio
+Ext  	Video            MIME type	type='...; codecs="..."'	      canPlay	 Notes
+.mp4	video/mp4	type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'	probably	H.264 Constrained baseline profile video (main and extended video compatible) level 3 and Low-Complexity AAC audio in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="avc1.58A01E, mp4a.40.2"'	probably	H.264 Extended profile video (baseline-compatible) level 3 and Low-Complexity AAC audio in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="avc1.4D401E, mp4a.40.2"'	probably	H.264 Main profile video level 3 and Low-Complexity AAC audio in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="avc1.64001E, mp4a.40.2"'	probably	H.264 'High' profile video (incompatible with main, baseline, or extended profiles) level 3 and Low-Complexity AAC audio in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="mp4v.20.8, mp4a.40.2"'		          MPEG-4 Visual Simple Profile Level 0 video and Low-Complexity AAC audio in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="mp4v.20.240, mp4a.40.2"'		        MPEG-4 Advanced Simple Profile Level 0 video and Low-Complexity AAC audio in MP4 container
+.webm	video/webm	type='video/webm; codecs="vp8, vorbis"'         probably  WebM video and Vorbis audio in Webm container
+.ogv	video/ogg	type='video/ogg; codecs="theora, vorbis"'         probably  Theora video and Vorbis audio in Ogg container
+.ogv	video/ogg	type='video/ogg; codecs="theora, speex"'		                Theora video and Speex audio in Ogg container
+.ogv	video/ogg	type='video/ogg; codecs="dirac, vorbis"'		                Dirac video and Vorbis audio in Ogg container
+.3gpp	video/3gpp	type='video/3gpp; codecs="mp4v.20.8, samr"'		            MPEG-4 Visual Simple Profile Level 0 video and AMR audio in 3GPP container
+.mkv	video/x-matroska	type='video/x-matroska; codecs="theora, vorbis"'		Theora video and Vorbis audio in Matroska container
+
+2) HTML5 Video only
+Ext  	Video            MIME type	type='...; codecs="..."'	      canPlay	 Notes
+.mp4	video/mp4	type='video/mp4; codecs="avc1.42E01E"'	probably	  H.264 Constrained baseline profile video (main and extended video compatible) level 3 in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="avc1.58A01E"'	probably	  H.264 Extended profile video (baseline-compatible) level 3 in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="avc1.4D401E"'	probably	  H.264 Main profile video level 3 in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="avc1.64001E"'	probably	  H.264 'High' profile video (incompatible with main, baseline, or extended profiles) level 3 in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="mp4v.20.8"'		            MPEG-4 Visual Simple Profile Level 0 video and Low-Complexity AAC audio in MP4 container
+.mp4	video/mp4	type='video/mp4; codecs="mp4v.20.240"'		          MPEG-4 Advanced Simple Profile Level 0 video in MP4 container
+.webm	video/webm	type='video/webm; codecs="vp8"'	       probably  	WebM video in Webm container
+.ogv	video/ogg	type='video/ogg; codecs="theora"'	       probably  	Theora video in Ogg container
+.ogv	video/ogg	type='video/ogg; codecs="dirac"'		                Dirac video in Ogg container
+.3gpp	video/3gpp	type='video/3gpp; codecs="mp4v.20.8"'	          	MPEG-4 Visual Simple Profile Level 0 video in 3GPP container
+.mkv	video/x-matroska	type='video/x-matroska; codecs="theora"'		Theora video in Matroska container
+
+3) HTML5 Audio only
+ Ext  	Video            MIME type	type='...; codecs="..."'	      canPlay	 Notes
+.mp4	audio/mp4	  type='audio/mp4;  codecs="mp4a.40.2"'	probably	Low-Complexity AAC audio in MP4 container
+.mp3	audio/mpeg	type='audio/mpeg;'	                  probably	MPEG Audio Layer 3 audio
+.webm	audio/webm	type='audio/webm; codecs="vorbis"'	  probably	Vorbis audio in Webm container
+.oga	audio/ogg	  type='audio/ogg;  codecs="vorbis"'	  probably	Vorbis audio in Ogg container
+.wav	audio/wav	  type='audio/wav;  codecs="1"'	        probably	PCM audio in Waveform Audio File Format (WAVE) container
+.spx	audio/ogg	  type='audio/ogg;  codecs="speex"'		            Speex audio in Ogg container
+.oga	audio/ogg	  type='audio/ogg;  codecs="flac"'	    probably	FLAC audio in Ogg container
+.3gp	audio/3gpp	type='audio/3gpp; codecs="samr"'		  AMR audio in 3GPP container
