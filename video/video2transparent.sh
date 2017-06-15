@@ -7,8 +7,8 @@
 function usage() {
    cat <<_EOF_
 Usage: 
-  $0 a.mp4 bgcolor color-relate-range
-  $0 a.mp4 4fff87 10
+  $ $0 a.mp4 bgcolor color-relate-range
+  $ $0 a.mp4 4fff87 10
 
   $ ls /tmp/videotrans/*
     ab.mp4 ab.webm mp3 png
