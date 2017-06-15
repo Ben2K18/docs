@@ -20,7 +20,7 @@ _EOF_
 [[ $# -eq 4 || $# -eq 5 ]] || usage
 [ -f $1 ] || usage
 
-src=$1
+src=$(realpath $1)
 bgc=${2:-white}
 fuzz=${3:-30}
 dst=$(realpath $4)
@@ -40,11 +40,6 @@ then
 fi
 
 mkdir -p $tmp/{mp3,png}
-
-#copy src to /tmp/videotrans$$
-unalias cp
-cp -pf $src $tmp/
-src=$tmp/$(basename $src)
 
 
 #convert
