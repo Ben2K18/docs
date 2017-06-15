@@ -17,7 +17,6 @@ _EOF_
 
    exit
 }
-usage
 
 #args
 [ $# -eq 3 ] || usage
