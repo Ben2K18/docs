@@ -1,0 +1,32 @@
+.vg
+
+..extend lv
+#df -h  
+  /dev/mapper/vg_ora-lv_ora   99G   79G   16G  84% /ora
+   
+#vgdisplay
+  VG Name               vg_ora 
+  VG Size               200.00 GiB
+  Free  PE / Size       25599 / 100.00 GiB 
+    
+#lvdisplay
+  LV Path                /dev/vg_ora/lv_ora
+  LV Name                lv_ora
+  VG Name                vg_ora
+  LV Size                100.00 GiB
+ 
+#lvextend -L +40g /dev/vg_ora/lv_ora
+
+#lvdisplay
+  LV Path                /dev/vg_ora/lv_ora
+  LV Name                lv_ora
+  VG Name                vg_ora
+  LV Size                140.00 GiB
+
+#mount -l
+ /dev/mapper/vg_ora-lv_ora on /ora type ext4 (rw,noatime,data=ordered) 
+ 
+#resize2fs /dev/mapper/vg_ora-lv_ora 140G
+
+#df -h  
+  /dev/mapper/vg_ora-lv_ora  138G   79G   53G  60% /ora
