@@ -17,32 +17,41 @@
 function usage() {
    cat <<_EOF_
 Usage:
-      $ $0 a.mp4 bgcolor color-relate-range dst [vp8|vp9]
-      $ $0 a.mp4 4fff87 10 /tmp/a.webm
-      $ $0 a.mp4 4fff87 10 /tmp/a-vp9.webm vp9
+      $ $0 a.mp4 bgcolor color-relate-range dst [vp8|vp9] bg.jpg text
+      $ $0 a.mp4 4fff87 10 dst.mp4  
+      $ $0 a.mp4 4fff87 10 dst.mp4 vp9
+      $ $0 a.mp4 4fff87 10 dst.mp4 vp9 bg.jpg
+      $ $0 a.mp4 4fff87 10 dst.mp4 vp9 bg.jpg text
 _EOF_
 
    exit
 }
 
-#args
-[[ $# -eq 4 || $# -eq 5 ]] || usage
-echo $#
-[ -f $1 ] || usage
-
 function realpath() {
-   file=$(basename $1)
-   dir=$(dirname $1)
+   cur=$(pwd)
+   file=$(basename "$1")
+   dir=$(dirname "$1")
    cd $dir
    dir=$(pwd)
+   cd $cur
    echo "$dir/$file"
 }
-echo $#
+
+#args
+[[ $# -ge 4 && $# -le 7 ]] || usage
+
+[ -f "$1" ] || usage
+
 src=$(realpath $1)
 bgc=${2:-white}
 fuzz=${3:-30}
 dst=$(realpath $4)
 vp=${5:-vp8}
+vbg=${6:-}
+txt=${7:-}
+
+[ -f "$vbg" ] && echo $vbg && vbg=$(realpath $vbg)
+
 fname=$(basename $src)
 fname=${fname%.*}
 
@@ -50,11 +59,11 @@ fname=${fname%.*}
 [ -f /usr/bin/ffmpeg ]  || apt install ffmpeg libav-tools
 [ -f /usr/bin/convert ] || apt install imagemagick
 
-tmp=/tmp/videotrans$$
 #create convert directory
-if [ -d $tmp ]
+tmp=/tmp/videotrans$$
+if [ -d "$tmp" ]
 then
-     rm -fr $tmp/*
+   rm -fr "$tmp/*"
 fi
 
 mkdir -p $tmp/{mp3,png}
@@ -73,18 +82,23 @@ rate=$(ffmpeg -i $src 2>&1 | sed -n "s/.*, \(.*\) fp.*/\1/p")
 yuva=$(ffmpeg -i $src 2>&1 | grep yuv | awk -F, '{print $2}'|sed 's/(.*//'|sed 's/\s\+//')
 
 #png to transparent
+echo png to trans and add bg begin...
 cd png
-echo begin...
 
 k=0
 pidlist=""
-cp /data/webs/ppt.yiyaozg.com/ppt.yiyaozg.com/mp4totrans/bj.jpg bj.jpg
+cp $vbg bgbgbg.jpg
 for f in $(find . -type f -name "*.png")
 do
     f=${f/\.\//}
-    convert $f -channel rgba -alpha set -fuzz ${fuzz}% -fill none -opaque "#${bgc}" trans-${f} && \
-    mogrify -gravity center -background transparent  -alpha Set -draw 'image Dst_Over 0,0 0,0 "bj.jpg"' trans-${f} && \
-    rm -f $f &
+    if [ -f "$vbg" ]
+    then
+       convert $f -channel rgba -alpha set -fuzz ${fuzz}% -fill none -opaque "#${bgc}" trans-${f} && \
+       mogrify -gravity center -background transparent  -alpha Set -draw 'image Dst_Over 0,0 0,0 "bgbgbg.jpg"' trans-${f} && \
+       rm -f $f &
+    else
+       convert $f -channel rgba -alpha set -fuzz ${fuzz}% -fill none -opaque "#${bgc}" trans-${f} && rm -f $f &
+    fi
 
     if [ ${#pidlist} -eq 0 ]
     then
@@ -125,21 +139,26 @@ do
     fi
 done
 
-echo finished ...
-cd ..
+echo png to trans and add bg finished...
 
 #combine png and mp3 to webm
+cd ..
 if [ $vp == "vp9" ]
 then
-    ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libvpx-vp9 -pix_fmt $yuva $dst
-    #ffmpeg -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libvpx-vp9  $dst
+    ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libvpx-vp9 -pix_fmt $yuva $tmp/dst-src.webm
 else
-    ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libvpx -pix_fmt $yuva $dst
+    ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libvpx -pix_fmt $yuva $tmp/dst-src.webm
 fi
 
-txt="Qcourse videos..."
-ffmpeg -i $dst -vf  "format=$yuva, drawbox=y=ih/PHI:color=black@0.4:width=iw:height=48:t=max, drawtext=fontfile=OpenSans-Regular.ttf:text='Qcourse videos...':fontcolor=white:fontsize=24:x=(w-tw)/2:y=(h/PHI)+th, format=yuv420p" -c:v libvpx -c:a copy -movflags +faststart /tmp/dst.webm
+#add text
+echo add text ...
+[ ${#txt} -gt 0 ] &&
+ffmpeg -i $tmp/dst-src.webm -vf "drawbox=y=ih/PHI:color=black@0.4:width=iw:height=36:t=max, drawtext=text='$txt':fontcolor=white:fontsize=18:x=(w-tw)/2:y=(h/PHI)+th, format=$yuva" -c:v libvpx -c:a copy -movflags +faststart $tmp/dst.webm
 
-avconv -i /tmp/dst.webm -c:v libx264  -strict experimental /tmp/out.mp4
+#convert webm to mp4
+avconv -i $tmp/dst.webm -c:v libx264  -strict experimental $dst
+
+#rm $tmp
 rm -fr $tmp
+
 #End of Script
