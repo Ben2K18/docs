@@ -18,10 +18,10 @@ function usage() {
    cat <<_EOF_
 Usage:
       $ $0 a.mp4 bgcolor color-relate-range dst [vp8|vp9] bg.jpg text
-      $ $0 a.mp4 4fff87 10 dst.mp4  
-      $ $0 a.mp4 4fff87 10 dst.mp4 vp9
-      $ $0 a.mp4 4fff87 10 dst.mp4 vp9 bg.jpg
-      $ $0 a.mp4 4fff87 10 dst.mp4 vp9 bg.jpg text
+      $ $0 a.mp4 4fff87 10 /tmp/a.webm  
+      $ $0 a.mp4 4fff87 10 /tmp/a-vp9.webm vp9
+      $ $0 a.mp4 4fff87 10 /tmp/a-vp9.webm vp9 bg.jpg
+      $ $0 a.mp4 4fff87 10 /tmp/a-vp9.webm vp9 bg.jpg text
 _EOF_
 
    exit
@@ -41,6 +41,8 @@ function realpath() {
 [[ $# -ge 4 && $# -le 7 ]] || usage
 
 [ -f "$1" ] || usage
+
+procs=25
 
 src=$(realpath $1)
 bgc=${2:-white}
@@ -71,15 +73,17 @@ mkdir -p $tmp/{mp3,png}
 #convert
 cd $tmp
 
+#get rate from video
+rate=$(ffmpeg -i $src 2>&1 | sed -n "s/.*, \(.*\) fp.*/\1/p")
+yuva=$(ffmpeg -i $src 2>&1 | grep yuv | awk -F, '{print $2}'|sed 's/(.*//'|sed 's/\s\+//')
+
+vsize=$(ffmpeg -i $src 2>&1 |grep -i Stream |grep Video | sed -E 's/^.+ ([0-9]+x[0-9]+),.+/\1/g')
+
 #extract audio from video
 ffmpeg -i $src -q:a 0 -map a mp3/${fname}.mp3
 
 #extract png from video
 ffmpeg -i $src -f image2 png/2\%d.png
-
-#get rate from video
-rate=$(ffmpeg -i $src 2>&1 | sed -n "s/.*, \(.*\) fp.*/\1/p")
-yuva=$(ffmpeg -i $src 2>&1 | grep yuv | awk -F, '{print $2}'|sed 's/(.*//'|sed 's/\s\+//')
 
 #png to transparent
 echo png to trans and add bg begin...
@@ -88,15 +92,19 @@ cd png
 k=0
 pidlist=""
 cp $vbg bgbgbg.jpg
+mogrify -resize "$vsize!" -quality 100  bgbgbg.jpg
 for f in $(find . -type f -name "*.png")
 do
     f=${f/\.\//}
     if [ -f "$vbg" ]
     then
+       #mogrify -quality 100 -gravity center -background transparent  -alpha Set -draw 'image Dst_Over 0,0 0,0 "bgbgbg.jpg"' trans-${f} && \
+       mogrify -resize "$vsize!" -quality 100 $f
        convert $f -channel rgba -alpha set -fuzz ${fuzz}% -fill none -opaque "#${bgc}" trans-${f} && \
-       mogrify -gravity center -background transparent  -alpha Set -draw 'image Dst_Over 0,0 0,0 "bgbgbg.jpg"' trans-${f} && \
+       mogrify -quality 100 -gravity center -draw 'image Dst_Over 0,0 0,0 "bgbgbg.jpg"' trans-${f} && \
        rm -f $f &
     else
+       mogrify -resize "$vsize!" -quality 100 $f
        convert $f -channel rgba -alpha set -fuzz ${fuzz}% -fill none -opaque "#${bgc}" trans-${f} && rm -f $f &
     fi
 
@@ -107,7 +115,7 @@ do
        pidlist="$pidlist,$!"
     fi
 
-    if [ $(( ++k % 20 ))  -eq 0 ] 
+    if [ $(( ++k % $procs ))  -eq 0 ] 
     then
         while true 
         do
@@ -115,7 +123,7 @@ do
            ps -p $pidlist > /dev/null
            if [ $? -eq 0 ]
            then
-               echo coverting $(( k-20 )) - $k ...
+               echo coverting $(( k-$procs )) - $k ...
                sleep 5
            else
                pidlist=""
@@ -131,7 +139,7 @@ do
     ps -p $pidlist > /dev/null
     if [ $? -eq 0 ]
     then
-        echo coverting $(( k-20 )) - $k ...
+        echo coverting $(( k-$procs )) - $k ...
         sleep 5
     else
         pidlist=""
@@ -145,20 +153,19 @@ echo png to trans and add bg finished...
 cd ..
 if [ $vp == "vp9" ]
 then
-    ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libvpx-vp9 -pix_fmt $yuva $tmp/dst-src.webm
+    #ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libvpx-vp9 -pix_fmt $yuva $tmp/dst-src.webm
+    ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libx264 -profile:v high -strict -2 -b:v 1000k -threads 10 -pix_fmt $yuva $tmp/dst-src.mp4
 else
-    ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libvpx -pix_fmt $yuva $tmp/dst-src.webm
+    ffmpeg -i mp3/${fname}.mp3 -framerate $rate -f image2 -i png/trans-2\%d.png -c:v libx264 -profile:v high -strict -2 -b:v 1000k -threads 10 -pix_fmt $yuva $tmp/dst-src.mp4
 fi
 
 #add text
 echo add text ...
 [ ${#txt} -gt 0 ] &&
-ffmpeg -i $tmp/dst-src.webm -vf "drawbox=y=ih/PHI:color=black@0.4:width=iw:height=36:t=max, drawtext=text='$txt':fontcolor=white:fontsize=18:x=(w-tw)/2:y=(h/PHI)+th, format=$yuva" -c:v libvpx -c:a copy -movflags +faststart $tmp/dst.webm
+ffmpeg -i $tmp/dst-src.mp4 -vf "drawbox=y=ih/PHI:color=black@0.4:width=iw:height=36:t=max, drawtext=text='$txt':fontcolor=white:fontsize=18:x=(w-tw)/2:y=(h/PHI)+th, format=$yuva" -c:v libx264 -strict -2 -c:a copy -movflags +faststart $dst
 
-#convert webm to mp4
-avconv -i $tmp/dst.webm -c:v libx264  -strict experimental $dst
+#avconv -i $tmp/dst.webm -c:v libx264  -strict experimental $dst
 
 #rm $tmp
-rm -fr $tmp
-
+#rm -fr $tmp
 #End of Script
