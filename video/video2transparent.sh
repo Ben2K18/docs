@@ -42,7 +42,7 @@ function realpath() {
 
 [ -f "$1" ] || usage
 
-procs=25
+procs=30
 
 src=$(realpath $1)
 bgc=${2:-white}
@@ -161,8 +161,9 @@ fi
 
 #add text
 echo add text ...
+#ffmpeg -i $tmp/dst-src.mp4 -vf "drawbox=y=ih/PHI-70:color=black@0.4:width=iw:height=36:t=max, drawtext=text='$txt':fontcolor=white:fontsize=18:x=(w-tw)/2:y=(h/PHI)+th, format=$yuva" -c:v libx264 -strict -2 -c:a copy -movflags +faststart $dst
 [ ${#txt} -gt 0 ] &&
-ffmpeg -i $tmp/dst-src.mp4 -vf "drawbox=y=ih/PHI:color=black@0.4:width=iw:height=36:t=max, drawtext=text='$txt':fontcolor=white:fontsize=18:x=(w-tw)/2:y=(h/PHI)+th, format=$yuva" -c:v libx264 -strict -2 -c:a copy -movflags +faststart $dst
+ffmpeg -i $tmp/dst-src.mp4 -vf "drawbox=y=ih-160:color=black@0.4:width=iw:height=60:t=max, drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf:text='$txt':fontcolor=white@0.8:fontsize=46:x=(w-tw)/2:y=h-190+th, format=$yuva" -c:v libx264 -strict -2 -c:a copy -movflags +faststart $dst
 
 #avconv -i $tmp/dst.webm -c:v libx264  -strict experimental $dst
 
