@@ -1,4 +1,3 @@
-.install
 1) download
  wget "https://www.isc.org/downloads/file/bind-9-10-5-p2/" -O bind.tar.gz
  tar xvf bind.tar.gz
