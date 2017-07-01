@@ -1,0 +1,202 @@
+.install
+1) download
+ wget "https://www.isc.org/downloads/file/bind-9-10-5-p2/" -O bind.tar.gz
+ tar xvf bind.tar.gz
+ cd bind-9.10.5-P2/
+ 
+ 2) modify
+ vim lib/dns/rbtdb.c
+   注释掉下面3行，从而使 @  CNAME www.a.com. 生效
+   # if (rbtversion != NULL &&
+   #     cname_and_other_data(rbtnode, rbtversion->serial))
+   #     return (DNS_R_CNAMEANDOTHER);
+ 
+ 3) install
+ yum install libxml2 libxml2-devel
+ ./configure --prefix=/usr/local/named --with-openssl --enable-threads --with-libxml2
+ make
+ make install
+ 
+ 
+ 4) configure
+ 
+ cd /usr/local/named/etc 
+ ../sbin/rndc-confgen -a
+ 
+ touch named.conf
+ mkdir -p db/pz
+ vim pz/127.0.0 
+ 
+ ./sbin/named 
+ 
+ iptables -A INPUT -s x.x.x.x -j ACCEPT
+ iptables -A INPUT -s y.y.y.y -j ACCEPT
+ 
+ ////////////////////// master & slave //////////////////////////
+ 
+.master
+1) /usr/local/named/etc/named.conf 
+
+ options {
+    directory "/usr/local/named/etc/db";
+    pid-file "/var/run/named.pid";
+    statistics-file "/var/run/named.stats";
+
+};
+
+logging {
+    category default { default_syslog; default_debug; };
+    category unmatched { null; };
+
+  channel default_syslog {
+      syslog daemon;	  
+      severity info;
+  };
+
+  channel default_debug {
+      file "named.run";
+      severity dynamic;
+  };
+
+  channel default_stderr {
+      stderr;
+      severity info;
+  };
+
+  channel null {
+      null;
+  };
+};
+
+//因为 directory "/usr/local/named/etc/db"; 所以zones.conf的实际位置在etc/db/zones.conf
+include "zones.conf";
+
+
+2) db/zones.conf
+
+zone "." {
+    type hint;
+    file "root.hints";
+};
+zone "0.0.127.in-addr.arpa" {
+    type master;
+    file "pz/127.0.0";
+};
+
+zone "a.com" {
+    type master;
+    file "a.com";
+};
+
+[root@XB-WebProxy-2 etc]# cat db/a.com 
+$TTL 3D
+@       IN      SOA     a.com. root.a.com. (
+                        199609206       ; serial, todays date + todays serial #
+                        8H              ; refresh, seconds
+                        2H              ; retry, seconds
+                        4W              ; expire, seconds
+                        1D )            ; minimum, seconds
+                NS      ns1
+ns1             A       127.0.0.1
+@               CNAME   www.baidu.com.
+
+[root@XB-WebProxy-2 etc]# cat db/pz/127.0.0 
+$TTL 3D
+@      IN      SOA     ns.local.domain. hostmaster.local.domain. (
+                        1       ; Serial
+                        8H      ; Refresh
+                        2H      ; Retry
+                        4W      ; Expire
+                        1D)     ; Minimum TTL
+                NS      ns.local.domain.
+1               PTR     localhost.
+
+
+///////////////////////////////////////////////////////
+ 
+.slave 
+1) /usr/local/named/etc/named.conf 
+
+options {
+    directory "/usr/local/named/etc/db";
+    pid-file "/var/run/named.pid";
+    statistics-file "/var/run/named.stats";
+	
+	#必须加下面这行，否则无法从master进行同步
+    masterfile-format text;
+}; 
+
+logging {
+    category default { default_syslog; default_debug; };
+    category unmatched { null; };
+
+  channel default_syslog {
+      syslog daemon;
+      severity info; 
+  };
+
+  channel default_debug {
+      file "named.run";  
+      severity dynamic;
+  };
+
+  channel default_stderr {
+      stderr;
+      severity info;
+  };
+
+  channel null {
+      null; 
+  };
+};
+
+include "zones.conf";
+
+
+2) vim db/zones.conf
+zone "." {
+    type hint;
+    file "root.hints";
+};
+
+zone "0.0.127.in-addr.arpa" {
+    type slave;
+    masters { 61.219.108.194; };
+    masterfile-format text;
+    file "pz/127.0.0";
+};
+
+zone "a.com" {
+    type slave;
+    masters { 61.219.108.194; };
+	
+
+    file "a.com";
+};
+
+
+[root@59-124-6-140 db]# cat a.com 
+$TTL 3D
+@       IN      SOA     a.com. root.a.com. (
+                        199609206       ; serial, todays date + todays serial #
+                        8H              ; refresh, seconds
+                        2H              ; retry, seconds
+                        4W              ; expire, seconds
+                        1D )            ; minimum, seconds
+                NS      ns1
+ns1             A       127.0.0.1
+@               CNAME   www.baidu.com.
+
+[root@59-124-6-140 db]# cat  pz/127.0.0 
+$ORIGIN .
+$TTL 259200	; 3 days
+0.0.127.in-addr.arpa	IN SOA	ns.local.domain. hostmaster.local.domain. (
+				1          ; serial
+				28800      ; refresh (8 hours)
+				7200       ; retry (2 hours)
+				2419200    ; expire (4 weeks)
+				86400      ; minimum (1 day)
+				)
+			NS	ns.local.domain.
+$ORIGIN 0.0.127.in-addr.arpa.
+1			PTR	localhost.
