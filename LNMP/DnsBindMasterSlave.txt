@@ -12,7 +12,7 @@
  
  3) install
  a) centos/redhat
- yum install libxml2 libxml2-devel
+    yum install libxml2 libxml2-devel
  
  b) ubuntu
     apt update
@@ -22,9 +22,9 @@
     apt install libxml2 libxml2-dev gcc libssl-dev make
  
  c)
- ./configure --prefix=/usr/local/named --with-openssl --enable-threads --with-libxml2
- make
- make install
+   ./configure --prefix=/usr/local/named --with-openssl --enable-threads --with-libxml2
+   make
+   make install
  
  
  4) configure
