@@ -11,7 +11,17 @@
    #     return (DNS_R_CNAMEANDOTHER);
  
  3) install
+ a) centos/redhat
  yum install libxml2 libxml2-devel
+ 
+ b) ubuntu
+    apt update
+    apt upgrade
+    apt autoclean
+    apt-get purge $(dpkg -l linux-{image,headers}-"[0-9]*" | awk '/ii/{print $2}' | grep -ve "$(uname -r | sed -r 's/-[a-z]+//')") 
+    apt install libxml2 libxml2-dev gcc libssl-dev make
+ 
+ c)
  ./configure --prefix=/usr/local/named --with-openssl --enable-threads --with-libxml2
  make
  make install
