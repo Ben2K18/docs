@@ -29,17 +29,12 @@
  
 4) configure
  A)
- cd /usr/local/named/etc 
- ../sbin/rndc-confgen -a
+ cd /chroot/named/etc 
+ /usr/local/named/sbin/rndc-confgen -a
  
  touch named.conf
  mkdir -p db/pz
  vim pz/127.0.0 
- 
- ./sbin/named 
- 
- iptables -A INPUT -s x.x.x.x -j ACCEPT
- iptables -A INPUT -s y.y.y.y -j ACCEPT
  
  B) master
   a) /chroot/named/etc/named.conf 
@@ -90,23 +85,20 @@ zone "a.com" {
     file "a.com";
 };
 
-  c) db/a.com 
+  c) db/xxx130.cn
 $ORIGIN .
 $TTL 3600	; 1 hour
-xxx130.top		IN SOA	ns1.dnsxx.com. root.xxx130.top. (
+xxx130.cn		IN SOA	ns1.dnsxx.com. root.xxx130.cn. (
 				5          ; serial
 				14400      ; refresh (4 hours)
 				3600       ; retry (1 hour)
 				604800     ; expire (1 week)
 				3600       ; minimum (1 hour)
 				)
-			NS	ns1.dns69676.com.
-			NS	ns2.dns69676.com.
-			NS	ns3.dns69676.com.
-			NS	ns4.dns69676.com.
-			A	59.124.6.140
-$ORIGIN xxx130.top.
-www			A	59.124.6.140
+			NS	ns1.dnsxx.com.
+			A	9.14.6.14
+$ORIGIN xxx130.cn.
+www			A	9.14.6.14
 
 
   d) db/pz/127.0.0 
@@ -141,15 +133,14 @@ zone "." {
 
 zone "0.0.127.in-addr.arpa" {
     type slave;
-    masters { 61.219.108.194; };
+    masters { x.x.x.x; };
     masterfile-format text;
     file "pz/127.0.0";
 };
 
 zone "a.com" {
     type slave;
-    masters { 61.219.108.194; };
-	
+    masters { x.x.x.x; };	
 
     file "a.com";
 };
