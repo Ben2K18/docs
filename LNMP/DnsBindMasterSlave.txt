@@ -209,3 +209,94 @@ $TTL 259200	; 3 days
 			NS	ns.local.domain.
 $ORIGIN 0.0.127.in-addr.arpa.
 1			PTR	localhost.
+
+6) /etc/init.d/named
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          named
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Should-Start:      $network $syslog
+# Should-Stop:       $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start and stop named
+# Description:       named is a Domain Name Server (DNS)
+#        which translates ip addresses to and from internet names
+#  update-rc.d named defaults
+#  update-rc.d named enable
+#
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+chroot=/chroot/named
+
+
+if [ $# -ne 1 ] 
+then
+    echo "Usage: $0 start|stop|restart|reload"
+    exit 1
+fi
+
+case "$1" in
+    start )
+
+           [ -f $chroot/var/run/named.pid ] && ps -f -p $(cat $chroot/var/run/named.pid) 2>&1 >/dev/null
+           if [ $? -eq 0 ]
+           then
+               echo "named is running ..."
+               break
+           else
+               while true
+               do
+                  [ -f $chroot/var/run/named.pid ] && ps -f -p $(cat $chroot/var/run/named.pid) 2>&1 >/dev/null
+                  if [ $? -eq 0 ]
+                  then
+                      echo "named start successfully ..."
+                      break
+                  else
+                      /usr/local/named/sbin/named -t $chroot -u named -c /etc/named.conf
+                      sleep 1
+                  fi
+               done
+           fi
+           ;;
+
+    stop )
+           while true 
+           do
+                [ -f $chroot/var/run/named.pid ] && ps -f -p $(cat $chroot/var/run/named.pid) 2>&1 >/dev/null
+
+                if [ $? -eq 0 ]
+                then
+                        kill -9 $(cat $chroot/var/run/named.pid)
+                else
+                        echo "named stopped successfully"
+                        break
+                fi
+            done
+            ;;
+
+    restart | reload )
+            $0 stop  
+
+#            /usr/bin/rsync -azPv --password-file=/etc/rsync/rsync.passwd rsync@x.x.x.::domains /chroot/named/etc/db/domains 2>&1 >/dev/null
+#            if [ $? -eq 0 ]
+#            then
+#               echo "sync from master successfully"
+#            else
+#               echo "sync from master failed"
+#            fi
+
+        
+            $0 start
+            [ -f $chroot/var/run/named.pid ] && ps -f -p $(cat $chroot/var/run/named.pid) 2>&1 >/dev/null
+            if [ $? -eq 0 ]
+            then
+               echo "start successfully"
+            else
+               echo "start failed"
+            fi
+            
+            ;;
+esac
