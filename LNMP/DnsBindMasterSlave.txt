@@ -279,24 +279,7 @@ case "$1" in
 
     restart | reload )
             $0 stop  
-
-#            /usr/bin/rsync -azPv --password-file=/etc/rsync/rsync.passwd rsync@x.x.x.::domains /chroot/named/etc/db/domains 2>&1 >/dev/null
-#            if [ $? -eq 0 ]
-#            then
-#               echo "sync from master successfully"
-#            else
-#               echo "sync from master failed"
-#            fi
-
-        
             $0 start
-            [ -f $chroot/var/run/named.pid ] && ps -f -p $(cat $chroot/var/run/named.pid) 2>&1 >/dev/null
-            if [ $? -eq 0 ]
-            then
-               echo "start successfully"
-            else
-               echo "start failed"
-            fi
             
             ;;
 esac
