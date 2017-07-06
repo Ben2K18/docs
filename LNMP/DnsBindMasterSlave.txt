@@ -42,12 +42,12 @@
  iptables -A INPUT -s y.y.y.y -j ACCEPT
  
  B) master
-  a) /usr/local/named/etc/named.conf 
+  a) /chroot/named/etc/named.conf 
 options {
 	masterfile-format text;
 	listen-on port 53 { 103.232.221.13; };
 
-	notify no;
+	#notify no;
 	#also-notify { none; };
 	#allow-transfer { none; };
 
@@ -122,10 +122,10 @@ $TTL 3D
 
 
 C)slave 
-  a) /usr/local/named/etc/named.conf 
+  a) /chroot/named/etc/named.conf 
 
 options {
-    directory "/usr/local/named/etc/db";
+    directory "/etc/db";
     pid-file "/var/run/named.pid";
     statistics-file "/var/run/named.stats";
 }; 
@@ -200,7 +200,6 @@ D) /etc/init.d/named
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 chroot=/chroot/named
-
 
 if [ $# -ne 1 ] 
 then
