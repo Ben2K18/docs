@@ -243,3 +243,7 @@ case "$1" in
             
             ;;
 esac
+
+E)
+ ufw allow 53/tcp
+ ufw allow 53/udp
