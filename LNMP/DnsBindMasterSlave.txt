@@ -3,14 +3,14 @@
  tar xvf bind.tar.gz
  cd bind-9.10.5-P2/
  
- 2) modify
- vim lib/dns/rbtdb.c
+2) modify
+  vim lib/dns/rbtdb.c
    注释掉下面3行，从而使 @  CNAME www.a.com. 生效
    # if (rbtversion != NULL &&
    #     cname_and_other_data(rbtnode, rbtversion->serial))
    #     return (DNS_R_CNAMEANDOTHER);
  
- 3) install
+3) install
  a) centos/redhat
     yum install libxml2 libxml2-devel
  
@@ -27,8 +27,8 @@
    make install
  
  
- 4) configure
- 
+4) configure
+ A)
  cd /usr/local/named/etc 
  ../sbin/rndc-confgen -a
  
@@ -41,52 +41,45 @@
  iptables -A INPUT -s x.x.x.x -j ACCEPT
  iptables -A INPUT -s y.y.y.y -j ACCEPT
  
- ////////////////////// master & slave //////////////////////////
- 
-.master
-1) /usr/local/named/etc/named.conf 
+ B) master
+  a) /usr/local/named/etc/named.conf 
+options {
+	masterfile-format text;
+	listen-on port 53 { 103.232.221.13; };
 
- options {
-    directory "/usr/local/named/etc/db";
-    pid-file "/var/run/named.pid";
-    statistics-file "/var/run/named.stats";
+	notify no;
+	#also-notify { none; };
+	#allow-transfer { none; };
 
+	allow-query { any; };
+	recursion no;
+	additional-from-cache yes;
+	query-source address * port *;
+
+	rate-limit {
+		responses-per-second 100;
+		window 100;
+	};
+
+	dnssec-enable yes;
+	dnssec-validation yes;
+	dnssec-lookaside auto;
+
+	directory "/etc/db";
+	pid-file "/var/run/named.pid";
+	statistics-file "/var/run/named.stats";
 };
 
-logging {
-    category default { default_syslog; default_debug; };
-    category unmatched { null; };
+#/etc/db/domains/zones.conf
+include "domains/zones.conf";
 
-  channel default_syslog {
-      syslog daemon;	  
-      severity info;
-  };
-
-  channel default_debug {
-      file "named.run";
-      severity dynamic;
-  };
-
-  channel default_stderr {
-      stderr;
-      severity info;
-  };
-
-  channel null {
-      null;
-  };
-};
-
-//因为 directory "/usr/local/named/etc/db"; 所以zones.conf的实际位置在etc/db/zones.conf
-include "zones.conf";
-
-
-2) db/zones.conf
+  b) db/zones.conf
 
 zone "." {
     type hint;
     file "root.hints";
 };
+
 zone "0.0.127.in-addr.arpa" {
     type master;
     file "pz/127.0.0";
@@ -97,19 +90,26 @@ zone "a.com" {
     file "a.com";
 };
 
-[root@XB-WebProxy-2 etc]# cat db/a.com 
-$TTL 3D
-@       IN      SOA     a.com. root.a.com. (
-                        199609206       ; serial, todays date + todays serial #
-                        8H              ; refresh, seconds
-                        2H              ; retry, seconds
-                        4W              ; expire, seconds
-                        1D )            ; minimum, seconds
-                NS      ns1
-ns1             A       127.0.0.1
-@               CNAME   www.baidu.com.
+  c) db/a.com 
+$ORIGIN .
+$TTL 3600	; 1 hour
+xxx130.top		IN SOA	ns1.dnsxx.com. root.xxx130.top. (
+				5          ; serial
+				14400      ; refresh (4 hours)
+				3600       ; retry (1 hour)
+				604800     ; expire (1 week)
+				3600       ; minimum (1 hour)
+				)
+			NS	ns1.dns69676.com.
+			NS	ns2.dns69676.com.
+			NS	ns3.dns69676.com.
+			NS	ns4.dns69676.com.
+			A	59.124.6.140
+$ORIGIN xxx130.top.
+www			A	59.124.6.140
 
-[root@XB-WebProxy-2 etc]# cat db/pz/127.0.0 
+
+  d) db/pz/127.0.0 
 $TTL 3D
 @      IN      SOA     ns.local.domain. hostmaster.local.domain. (
                         1       ; Serial
@@ -121,48 +121,19 @@ $TTL 3D
 1               PTR     localhost.
 
 
-///////////////////////////////////////////////////////
- 
-.slave 
-1) /usr/local/named/etc/named.conf 
+C)slave 
+  a) /usr/local/named/etc/named.conf 
 
 options {
     directory "/usr/local/named/etc/db";
     pid-file "/var/run/named.pid";
     statistics-file "/var/run/named.stats";
-	
-	#必须加下面这行，否则无法从master进行同步
-    masterfile-format text;
 }; 
 
-logging {
-    category default { default_syslog; default_debug; };
-    category unmatched { null; };
-
-  channel default_syslog {
-      syslog daemon;
-      severity info; 
-  };
-
-  channel default_debug {
-      file "named.run";  
-      severity dynamic;
-  };
-
-  channel default_stderr {
-      stderr;
-      severity info;
-  };
-
-  channel null {
-      null; 
-  };
-};
-
-include "zones.conf";
+include "domains/zones.conf";
 
 
-2) vim db/zones.conf
+  b) vim db/zones.conf
 zone "." {
     type hint;
     file "root.hints";
@@ -183,8 +154,7 @@ zone "a.com" {
     file "a.com";
 };
 
-
-[root@59-124-6-140 db]# cat a.com 
+  c) cat a.com 
 $TTL 3D
 @       IN      SOA     a.com. root.a.com. (
                         199609206       ; serial, todays date + todays serial #
@@ -196,7 +166,7 @@ $TTL 3D
 ns1             A       127.0.0.1
 @               CNAME   www.baidu.com.
 
-[root@59-124-6-140 db]# cat  pz/127.0.0 
+   d) cat  pz/127.0.0 
 $ORIGIN .
 $TTL 259200	; 3 days
 0.0.127.in-addr.arpa	IN SOA	ns.local.domain. hostmaster.local.domain. (
@@ -210,7 +180,7 @@ $TTL 259200	; 3 days
 $ORIGIN 0.0.127.in-addr.arpa.
 1			PTR	localhost.
 
-6) /etc/init.d/named
+D) /etc/init.d/named
 #!/bin/bash
 ### BEGIN INIT INFO
 # Provides:          named
