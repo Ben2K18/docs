@@ -1,0 +1,64 @@
+.Server
+1) /etc/rsyncd/rsyncd.conf 
+pid file = /var/run/rsyncd.pid   
+port = 873
+address = 0.0.0.0
+uid = root   
+gid = root   
+ 
+use chroot = yes 
+read only = no 
+
+#客户端IP
+hosts allow=3.2.75.13
+hosts deny=*
+ 
+max connections = 5
+motd file = /etc/rsyncd/rsyncd.motd
+ 
+log format = %t %a %m %f %b
+syslog facility = local3
+timeout = 300
+ 
+[domains]   
+path = /chroot/named/etc/db/domains/
+#exclude = zones.conf db 
+list=yes
+ignore errors
+auth users = rsync
+secrets file = /etc/rsyncd/rsyncd.secrets
+
+2) /etc/rsyncd/rsyncd.secrets 
+rsync:passwd123
+
+3) chmod 600 /etc/rsyncd/rsyncd.secrets
+
+
+.client
+1) /etc/rsync/rsync.passwd 
+passwd123
+
+2) chmod 600 /etc/rsync/rsync.passwd 
+
+3) rsync.sh
+#!/bin/bash
+tmp=/tmp/rsync$$
+/usr/bin/rsync -azPv --delete --password-file=/etc/rsync/rsync.passwd rsyncuser@1.2.21.33::domains /chroot/named/etc/db/domains  2>&1 >$tmp
+
+if [ $? -eq 0 ]
+then
+   echo "sync from master successfully"
+
+   grep -E 'kB\/s|\.\/|deleting' $tmp
+   if [ $? -eq 0 ]
+   then
+      echo changes has been applied
+   else
+      echo no differents with master
+   fi
+else
+   echo "sync from master failed"
+   cat $tmp
+fi
+
+rm -f $tmp
