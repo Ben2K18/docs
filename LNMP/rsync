@@ -54,7 +54,7 @@ then
    then
       echo changes has been applied
    else
-      echo no differents with master
+      echo no differences with master
    fi
 else
    echo "sync from master failed"
