@@ -29,7 +29,7 @@ auth users = rsync
 secrets file = /etc/rsyncd/rsyncd.secrets
 
 2) /etc/rsyncd/rsyncd.secrets 
-rsync:passwd123
+rsyncuser:passwd123
 
 3) chmod 600 /etc/rsyncd/rsyncd.secrets
 
