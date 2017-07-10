@@ -117,10 +117,32 @@ C)slave
   a) /chroot/named/etc/named.conf 
 
 options {
-    directory "/etc/db";
-    pid-file "/var/run/named.pid";
-    statistics-file "/var/run/named.stats";
-}; 
+        masterfile-format text;
+        listen-on port 53 { x.x.x.x; };
+
+        notify no;
+        also-notify { none; };
+        allow-transfer { none; };
+        allow-query-cache { any; };
+
+        allow-query { any; };
+        recursion no;
+        additional-from-cache yes;
+        query-source address * port *;
+
+        rate-limit {
+                responses-per-second 100;
+                window 100;
+        };
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+        dnssec-lookaside auto;
+
+        directory "/etc/db";
+        pid-file "/var/run/named.pid";
+        statistics-file "/var/run/named.stats";
+};
 
 include "domains/zones.conf";
 
