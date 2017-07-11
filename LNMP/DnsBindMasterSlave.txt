@@ -269,3 +269,66 @@ esac
 E)
  ufw allow 53/tcp
  ufw allow 53/udp
+
+F) multiadd.sh
+#!/bin/bash
+
+domains=(
+          abc.com^@:x.x.x.x^www:x.x.x.x
+          def.com^@:x.x.x.x^www:x.x.x.x
+)
+
+function CreateDomain
+{
+    root=/chroot/named/etc/db/domains
+    domain=$1
+    aip=$2
+    sub2=$3
+    sub2ip=$4
+
+    grep $domain $root/zones.conf >/dev/null
+    if [ $? -eq 0 ]
+    then
+      echo "$domain exists ..."
+      return 0
+    fi
+
+    cat >> $root/zones.conf <<_DOC_
+
+zone "$domain"
+{
+    type master;
+    file "domains/$domain";
+};
+_DOC_
+
+echo
+
+    cat > $root/$domain <<_DOC_
+\$ORIGIN .
+\$TTL 3600
+$domain  IN  SOA  ns1.dnsabc.com. root.$domain. (
+                3       ; serial
+                3600    ; refresh
+                7200    ; retry
+                604800  ; expire
+                3600    ; minimum
+        )
+	NS  ns1.dnsabc.com.
+	NS  ns2.dnsabc.com.
+	A   $aip
+\$ORIGIN $domain.
+$sub2	A	$sub2ip
+_DOC_
+}
+
+
+for domain in ${domains[@]}
+do
+   IFS=^ read dm sub1 sub2 <<< "$domain"
+   IFS=: read sub1 sub1ip <<< "$sub1"
+   IFS=: read sub2 sub2ip <<< "$sub2"
+
+   CreateDomain $dm $sub1ip $sub2 $sub2ip
+   echo 
+done
