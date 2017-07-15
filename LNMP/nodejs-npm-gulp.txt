@@ -7,7 +7,7 @@
   1) install nodejs
      apt-get install python-software-properties
      curl -sL https://deb.nodesource.com/setup_8.x |  bash -
-     apt-get install --yes nodejs npm
+     apt-get install --yes nodejs
      ln -s /usr/bin/nodejs /usr/bin/node 
 
   2)create testnpm
