@@ -17,7 +17,8 @@
      npm init 
      npm install --save-dev run-sequence 
      npm install -g gulp --save-dev gulp	   
-	    npm install gulp gulp-autoprefixer
+     npm install gulp gulp-autoprefixer
+     npm install -g gulp
      npm install --save semantic-ui
    
      cd semantic
