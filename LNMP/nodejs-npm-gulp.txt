@@ -1,13 +1,32 @@
  .install semantic-ui  (https://semantic-ui.com/introduction/getting-started.html)
+  1) install nodejs
+     apt-get install python-software-properties
+     curl -sL https://deb.nodesource.com/setup_8.x |  bash -
+     apt-get install --yes nodejs npm
+     ln -s /usr/bin/nodejs /usr/bin/node 
+
+  2)create testnpm
+     mkdir /tmp/testnpm
+     cd /tmp/testnpm/
+  
+  3) install semantic-ui
+     npm init 
+     npm install --save-dev run-sequence 
+     npm install -g gulp --save-dev gulp	   
+	    npm install gulp gulp-autoprefixer
+     npm install --save semantic-ui
+   
+     cd semantic
+     sed -i '/preserveComments/d' tasks/config/tasks.js
+  
+     gulp build 
  
-   apt-get install --yes nodejs npm
-   ln -s /usr/bin/nodejs /usr/bin/node 
-   mkdir testnpm
-   cd testnpm/ 
-   npm init 
-   npm install 
-   npm install -g gulp --save-dev gulp
-   npm install --save-dev run-sequence   
-   npm install --save semantic-ui
-   cd semantic
-   gulp build 
+  4) cp dist
+     cp -pfr dist /www/htdocs/www.a.com/js/semantic
+  
+  5) html test ( a.html )  
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" 
+        crossorigin="anonymous"></script>
+        
+<link rel="stylesheet" type="text/css" href="js/semantic/semantic.min.css">        
+<script src="js/semantic/semantic.min.js"></script>
