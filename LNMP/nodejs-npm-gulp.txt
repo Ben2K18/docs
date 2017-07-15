@@ -1,0 +1,13 @@
+ .install semantic-ui  (https://semantic-ui.com/introduction/getting-started.html)
+ 
+   apt-get install --yes nodejs npm
+   ln -s /usr/bin/nodejs /usr/bin/node 
+   mkdir testnpm
+   cd testnpm/ 
+   npm init 
+   npm install 
+   npm install -g gulp --save-dev gulp
+   npm install --save-dev run-sequence   
+   npm install --save semantic-ui
+   cd semantic
+   gulp build 
