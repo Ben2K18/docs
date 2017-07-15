@@ -1,4 +1,9 @@
  .install semantic-ui  (https://semantic-ui.com/introduction/getting-started.html)
+  0)
+     apt update
+     apt upgrade
+     apt install curl wget vim
+ 
   1) install nodejs
      apt-get install python-software-properties
      curl -sL https://deb.nodesource.com/setup_8.x |  bash -
