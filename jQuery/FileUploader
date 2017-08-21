@@ -17,25 +17,25 @@
     2)  Only Drop a file on button
        <button id="uploadfile">Drop On Me</button>
        <script>
-         $("#uploadfile").dropUpload('/upload', function(data){
-           console.log(data)
-         },function(data){
-           console.log(data)
-         });
+           $("#uploadfile").dropUpload('/upload', function(data){
+              console.log(data)
+           },function(data){
+              console.log(data)
+           });
         </script>
 
     3) click and drop
         <input id="uploadfile" type="file" name="file" multiple="multiple" title="Click to add Files" style="display: block;">
         <button id="uploadfile">ClickMe</button>
         <script>
-        $("#uploadfile").dropUpload('/upload', function(data){
-           console.log(data)
-        }).clickUpload('/upload', "#upload_input_file", function(data){
-           console.log(data)
-        }, function(data){
-           console.log("error");
-           console.log(data);
-        });
+           $("#uploadfile").dropUpload('/upload', function(data){
+              console.log(data)
+           }).clickUpload('/upload', "#upload_input_file", function(data){
+              console.log(data)
+           }, function(data){
+              console.log("error");
+              console.log(data);
+           });
  */
  
 (function ($) {
