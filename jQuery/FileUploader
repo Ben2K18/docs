@@ -12,7 +12,7 @@
               console.log("error");
               console.log(data);
           });
- </script>
+        </script>
 
     2)  Only Drop a file on button
        <button id="uploadfile">Drop On Me</button>
