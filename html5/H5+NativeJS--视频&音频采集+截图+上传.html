@@ -233,29 +233,33 @@
 </head>
 
 <body>
-<button onclick="recordVideoNativJS1();">recordVideoNativJS1</button>
-<button onclick="recordVideoNativJS2();">Native2摄像</button>
+   <button onclick="recordVideoNativJS1();">recordVideoNativJS1</button>
+   <button onclick="recordVideoNativJS2();">Native2摄像</button>
 
-<button onclick="H5RecordVideo();">H5摄像</button>
-<button onclick="stopH5RecordVideo();">H5停止摄像</button>
-<button onclick="recordAudio();">录音</button>
-<br/>
+   <button onclick="H5RecordVideo();">H5摄像</button>
+   <button onclick="stopH5RecordVideo();">H5停止摄像</button>
+   <button onclick="recordAudio();">录音</button> 
+    
+    <br/>
 
-<input type="file" id="upload_input_file" name="file" style="display: none;">
-
-<video id="videoPlayer" src='http://chat.yiyaozg.com/video/1503545229373.mp4' type="video/3gpp" controls width="400"
+   <input type="file" id="upload_input_file" name="file" style="display: none;">
+   <video id="videoPlayer" src='http://chat.yiyaozg.com/video/1503545229373.mp4' type="video/3gpp" controls width="400"
        height="320" style="border: 2px solid red;"></video>
-<br><br>
-<button onclick="shipinjietu('http://chat.yiyaozg.com/video/test.3gp');">Capture</button>
-<br/><br/> Canvas:
-
-<br>
-<canvas id="canvas" style="border: 2px solid red; width:200px; height: 200px;"></canvas>
-<br/><br/> Capture Pic:<br>
-<div id="capimg" style="border: 2px solid red; width:200px; height: 200px;">
+    
+   <br><br>
+   <button onclick="shipinjietu('http://chat.yiyaozg.com/video/test.3gp');">截图</button>
+    
+   <br/><br/>
+    
+    Canvas:<br>
+   <canvas id="canvas" style="border: 2px solid red; width:200px; height: 200px;"></canvas>
+   <br/><br/> Capture Pic:<br>
+    
+   <div id="capimg" style="border: 2px solid red; width:200px; height: 200px;">
     <img src='' width="200px" height="200px">
-</div>
-<br>
-<div><span id="processing"></span></div>
+   </div>
+    
+   <br>
+   <div><span id="processing"></span></div>
 </body>
 </html>
