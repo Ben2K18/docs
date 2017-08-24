@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<script type="text/javascript">
+//压缩图片
+function compressImage(){
+	plus.zip.compressImage({
+			src:"_www/a.jpg",
+			dst:"_doc/a.jpg",
+			quality:20
+		},
+		function() {
+			alert("Compress success!");
+		},function(error) {
+			alert("Compress error!");
+	});
+}
+
+//缩放图片
+function zoomImage(){
+	plus.zip.compressImage({
+			src:"_www/a.jpg",
+			dst:"_doc/a.jpg",
+			width:"50%"		// 缩小到原来的一半
+		},
+		function() {
+			alert("Compress success!");
+		},function(error) {
+			alert("Compress error!");
+	});
+}
+
+//旋转图片
+function rotateImage(){
+	plus.zip.compressImage({
+			src:"_www/a.jpg",
+			dst:"_doc/a.jpg",
+			rotate:90		// 旋转90度
+		},
+		function() {
+			alert("Compress success!");
+		},function(error) {
+			alert("Compress error!");
+	});
+}
+
+//裁剪图片
+function clipImage(){
+	plus.zip.compressImage({
+			src:"_www/a.jpg",
+			dst:"_doc/a.jpg",
+			clip:{top:"25%",left:"25%",width:"50%",height:"50%"}		// 裁剪图片中心区域
+		},
+		function() {
+			alert("Compress success!");
+		},function(error) {
+			alert("Compress error!");
+	});
+}
+
+//格式转换
+function convertImage(){
+	plus.zip.compressImage({
+			src:"_www/a.jpg",
+			dst:"_doc/a.png",
+			format:"png"		// 将jpg转换成png格式
+		},
+		function() {
+			alert("Compress success!");
+		},function(error) {
+			alert("Compress error!");
+	});
+}
+	</script>
+	</head>
+	<body >
+		<button onclick="compressImage()">压缩图片</button><br/>
+		<button onclick="zoomImage()">缩放图片</button><br/>
+		<button onclick="rotateImage()">旋转图片</button><br/>
+		<button onclick="clipImage()">裁剪图片</button><br/>
+		<button onclick="convertImage()">格式转换</button><br/>
+	</body>
+</html>
+	
