@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js"></script>
+    <title>Camera Example</title>
+    <script type="text/javascript">
+        // 扩展API加载完毕后调用onPlusReady回调函数
+        document.addEventListener("plusready", onPlusReady, false);
+
+        // 扩展API加载完毕，现在可以正常调用扩展API
+        function onPlusReady() {
+            //shipinjietu("http://chat.yiyaozg.com/video/1503545229373.mp4");
+        }
+
+        function shipinjietu(local_system_url) {
+            try {
+                var video = document.getElementById('videoPlayer');
+                video.src = local_system_url;
+                video.preload = 'metadata';
+
+                video.load();
+
+                video.onloadeddata = function () {
+                    var canvas = document.createElement("canvas");
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    var context = canvas.getContext("2d");
+
+                    video = document.getElementById("videoPlayer");
+                    context.drawImage(video, 0, 0, video.clientWidth, video.clientHeight);
+                    $("#capimg img").attr('src', canvas.toDataURL("image/png"));
+                };
+
+            } catch (e) {
+                alert(e.message + " " + e.line)
+            }
+        }
+
+        //~ capture
+
+        ////Native 3gp 1 录像
+        function recordVideoNativJS1() {
+            var VIDEOZOOM = 200;
+            var File = plus.android.importClass("java.io.File");
+            var Uri = plus.android.importClass("android.net.Uri");
+            var MediaStore = plus.android.importClass("android.provider.MediaStore");
+            var Intent = plus.android.importClass("android.content.Intent");
+            var intent = new Intent("android.media.action.VIDEO_CAPTURE");
+            var Environment = plus.android.importClass("android.os.Environment");
+            var chatpath = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + '/chat/');
+            if (!chatpath.exists())
+                chatpath.mkdir();
+
+            var outPutPath = plus.io.convertLocalFileSystemURL(File.createTempFile("video", ".ogg", chatpath).getAbsolutePath());
+            intent.putExtra("android.intent.extra.videoQuality", 0);
+            intent.putExtra("android.intent.extra.durationLimit", 15); //设置录像时间
+
+            var main = plus.android.runtimeMainActivity();
+            main.startActivityForResult(intent, VIDEOZOOM);
+            main.onActivityResult = function (requestCode, resultCode, data) {
+                var context = main;
+                plus.android.importClass(data);
+                var contactData = data.getData();
+                var resolver = context.getContentResolver();
+                plus.android.importClass(resolver);
+                var cursor = resolver.query(contactData, null, null, null, null);
+
+                plus.android.importClass(cursor);
+
+                cursor.moveToFirst();
+                var column = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+
+                plus.io.resolveLocalFileSystemURL(cursor.getString(column), function (entry) {
+                    //file: size,type,name,lastModifiedDate,fullPath,slice,close
+                    entry.file(function (file) {
+                        try {
+                            plus.io.resolveLocalFileSystemURL(file.fullPath, function (entry) {
+                                shipinjietu(entry.toLocalURL());
+                                createUpload(file.fullPath);
+                            }, function (e) {
+                                outLine("读取录像文件错误：" + e.message);
+                            });
+                        } catch (e) {
+                            console.log(e.lineNumber + ': ' + e.message)
+                        }
+                    });
+                }, function (e) {
+                    plus.nativeUI.toast("Resolve file URL failed: " + e.message);
+                });
+
+            };
+        }
+
+        function recordVideoNativJS2() {
+            var File = plus.android.importClass("java.io.File");
+            var Uri = plus.android.importClass("android.net.Uri");
+            var MediaStore = plus.android.importClass("android.provider.MediaStore");
+            var Intent = plus.android.importClass("android.content.Intent");
+            var Environment = plus.android.importClass("android.os.Environment");
+
+            var intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+
+            var chatpath = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + '/chat/');
+            if (!chatpath.exists())
+                chatpath.mkdir();
+
+            var outPutPath = plus.io.convertLocalFileSystemURL(File.createTempFile("video", ".ogg", chatpath).getAbsolutePath());
+
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(outPutPath))); //录像输出位置
+
+            intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0); //0 最低质量, 1高质量
+            intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 15); //控制录制时间单位秒
+            var main = plus.android.runtimeMainActivity();
+            main.startActivityForResult(intent, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            main.onActivityResult = function (request, code, data) {
+                //停止录像
+                console.log(outPutPath) //输出文件位置
+                plus.io.resolveLocalFileSystemURL(outPutPath, function (entry) {
+                    var p = entry.toLocalURL();
+                    alert("79 : " + p);
+                    shipinjietu(p);
+                }, function (e) {
+                    outLine("读取录像文件错误：" + e.message);
+                });
+                createUpload(outPutPath);
+            }
+        }
+
+        // H5摄像
+        var cmr = null;
+
+        function H5RecordVideo() {
+            cmr = plus.camera.getCamera();
+            var res = cmr.supportedVideoResolutions[0];
+            var fmt = cmr.supportedVideoFormats[0];
+            cmr.startVideoCapture(function (path) {
+                    plus.io.resolveLocalFileSystemURL(path, function (entry) {
+                        var p = entry.toLocalURL();
+                        alert("212 Capture: " + path + " " + p)
+                        shipinjietu(p);
+                    }, function (e) {
+                        outLine("读取录像文件错误：" + e.message);
+                    });
+
+                    createUpload(path);
+                },
+                function (error) {
+                    console.log("Capture video failed: " + error.message);
+                }, {
+                    resolution: "720*480",
+                    format: fmt
+                });
+        }
+
+        // 停止摄像
+        function stopH5RecordVideo() {
+            console.log("stopCapture");
+            cmr.stopH5RecordVideo();
+        }
+
+        //~ H5摄像
+
+        //录制音频
+        function recordAudio() {
+            var MediaStore = plus.android.importClass("android.provider.MediaStore");
+            var Intent = plus.android.importClass("android.content.Intent");
+            var intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+
+            var main = plus.android.runtimeMainActivity();
+            main.startActivityForResult(intent, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            main.onActivityResult = function (requestCode, resultCode, intentData) {
+                console.log(requestCode);
+                console.log(resultCode);
+                var file_fullpath = intentData.getData();
+                createUpload(file_fullpath.toString());
+
+                if (requestCode == Intent.FLAG_ACTIVITY_CLEAR_TOP) {
+                     if(resultCode == Intent.RESULT_OK) {
+                    	console.log("finished!");
+                    }
+                }
+            }
+        }
+        //~录制音频
+
+        //upload
+        function refreshStatus(str) {
+            $("#processing").text($("#processing").text() + str);
+        }
+
+        // 监听上传任务状态
+        function onStateChanged(upload, status) {
+            if (upload.state == 1) {
+                $("#processing").text("上传开始:   建立网络连接，发送请求到服务器并等待服务器的响应");
+            } else if (upload.state == 2) {
+                refreshStatus("<br>" + "上传网络连接已建立，服务器返回响应，准备传输数据内容");
+            } else if (upload.state == 3) {
+                $("#processing").text(' uploading ... ' + upload.uploadedSize + '/' + upload.totalSize + ' ' + parseInt(upload.uploadedSize * 100 / upload.totalSize) + '%');
+            } else if (upload.state == 4 && status == 200) {
+                // 上传完成
+                var json = JSON.parse(upload.responseText);
+            } else if (upload.state == 5) {
+                console.log("上传暂停")
+            }
+        }
+
+        // 创建上传任务
+        function createUpload(filepath) {
+            var task = plus.uploader.createUpload("http://chat.yiyaozg.com/upload", {
+                method: "POST",
+                blocksize: 204800,
+                priority: 100
+            }, function (t, status) {
+                if (status == 200) {
+                    console.log("Upload success: " + t.responseText);
+
+                } else {
+                    console.log("Upload failed: " + status);
+                }
+            });
+            task.addFile(filepath, {
+                key: "testdoc"
+            });
+            task.addData("string_key", "string_value");
+            task.addEventListener("statechanged", onStateChanged, false);
+            task.start();
+        }
+        //~upload
+    </script>
+</head>
+
+<body>
+<button onclick="recordVideoNativJS1();">recordVideoNativJS1</button>
+<button onclick="recordVideoNativJS2();">Native2摄像</button>
+
+<button onclick="H5RecordVideo();">H5摄像</button>
+<button onclick="stopH5RecordVideo();">H5停止摄像</button>
+<button onclick="recordAudio();">录音</button>
+<br/>
+
+<input type="file" id="upload_input_file" name="file" style="display: none;">
+
+<video id="videoPlayer" src='http://chat.yiyaozg.com/video/1503545229373.mp4' type="video/3gpp" controls width="400"
+       height="320" style="border: 2px solid red;"></video>
+<br><br>
+<button onclick="shipinjietu('http://chat.yiyaozg.com/video/test.3gp');">Capture</button>
+<br/><br/> Canvas:
+
+<br>
+<canvas id="canvas" style="border: 2px solid red; width:200px; height: 200px;"></canvas>
+<br/><br/> Capture Pic:<br>
+<div id="capimg" style="border: 2px solid red; width:200px; height: 200px;">
+    <img src='' width="200px" height="200px">
+</div>
+<br>
+<div><span id="processing"></span></div>
+</body>
+</html>
