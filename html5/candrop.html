@@ -1,11 +1,16 @@
 <img src="a.png" 
      id="upimage"
      ondrop="(function(e){e.preventDefault(); alert('start drop');})(event)"
+     ondragover="(function(e){e.preventDefault(); alert('drag over');})(event)"
 >
 <script>
-$("#upimage").on("drop", function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            //...
-});
+   $("#upimage").on("drop", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      //...
+   }).on("dragover", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      //...
+   });
 </script>
