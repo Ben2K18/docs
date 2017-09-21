@@ -1,0 +1,11 @@
+<img src="a.png" 
+     id="upimage"
+     ondrop="(function(e){e.preventDefault(); alert('start drop');})(event)"
+>
+<script>
+$("#upimage").on("drop", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            //...
+});
+</script>
