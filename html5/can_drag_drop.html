@@ -1,0 +1,12 @@
+//this div can be dropped
+<div id="div"
+     ondrop="(function(e){e.preventDefault(); alert('drop start');})(event)"
+     ondragover="(function(e){e.preventDefault(); alert('drop over');})(event)"
+>
+
+//this img can drag and drop to above div
+<img id="img"
+     src="a.gif"
+     draggable="true"
+     ondragstart="(function(e){e.preventDefault(); alert('drop start');}"
+>
