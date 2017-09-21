@@ -10,3 +10,21 @@
      draggable="true"
      ondragstart="(function(e){e.preventDefault(); alert('drop start');}"
 >
+     
+<script>
+   $("#div").on("drop", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      //...
+   }).on("dragover", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      //...
+   });
+     
+   $("#img").on("dragstart", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      //...
+   })   
+</script>     
