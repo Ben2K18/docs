@@ -1,4 +1,7 @@
 <pre>
+<b>.apk</b>
+  apk <add|del|search> vim
+  
 <b>.Setting System Hostname</b>
 # echo "shortname" > /etc/hostname
 # hostname -F /etc/hostname
@@ -65,3 +68,26 @@ lbu ci
   
   drill baidu.com @8.8.8.8
   
+<b>.vlan</b>
+  apk add vlan
+
+<b>.bond</b>
+  apk add bonding
+
+/etc/network/interfaces:
+auto bond0
+iface bond0 inet static
+	address 192.168.0.2
+	netmask 255.255.255.0
+	gateway 192.168.0.1
+	# specify the ethernet interfaces that should be bonded
+	bond-slaves eth0 eth1 eth2 eth3
+
+<b>.vim</b>
+  apk add vim
+  
+<b>.openssh</b>
+  apk add openssh
+
+<b>.desktop</b>
+  apk add xfce4
