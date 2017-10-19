@@ -44,3 +44,24 @@ lbu ci
 rc-update add ip6tables 
 /etc/init.d/ip6tables save
 lbu ci 
+
+<b>.restart network</b>
+/etc/init.d/networking restart
+
+<b>.install iputils</b>
+ apk add iputils
+ 
+<b>.iproute2</b>
+  apk add iproute2
+   
+  ss -tl
+  ss -ptl
+  ss -tnl
+  ss -ta
+  ss -s
+
+<b>.dig drill</b>
+  apk add drill
+  
+  drill baidu.com @8.8.8.8
+  
