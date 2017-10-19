@@ -1,7 +1,13 @@
 <pre>
 <b>.apk</b>
   apk add|del|search vim
-  
+  apk info -a zlib
+  apk info --who-owns /bin/ls
+     /bin/ls symlink target is owned by busybox-1.26.2-r7
+
+<b>.mount</b>  
+  mount -o remount,rw /media/sda1
+
 <b>.Setting System Hostname</b>
 # echo "shortname" > /etc/hostname
 # hostname -F /etc/hostname
