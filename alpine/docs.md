@@ -11,6 +11,12 @@
   apk info -R package1 package2
   apk info -r package1 package2
 
+<b>.rc-update</b>
+   apk add openssh
+   rc-update add sshd
+   rc-status
+   /etc/init.d/sshd start
+
 <b>.mount</b>  
   mount -o remount,rw /media/sda1
 
@@ -52,7 +58,8 @@ apk add iptables
 apk add ip6tables
 apk add iptables-doc
 
-rc-update add iptables 
+rc-update add|del iptables 
+rc-status
 /etc/init.d/iptables save
 lbu ci 
 
