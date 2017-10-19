@@ -4,6 +4,12 @@
   apk info -a zlib
   apk info --who-owns /bin/ls
      /bin/ls symlink target is owned by busybox-1.26.2-r7
+  apk cache clean 
+  apk -v cache clean
+  
+  required check
+  apk info -R package1 package2
+  apk info -r package1 package2
 
 <b>.mount</b>  
   mount -o remount,rw /media/sda1
