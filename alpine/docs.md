@@ -1,4 +1,26 @@
 <pre>
+<b>.docker run alpine</b>
+   docker run -it -d -p 8889:80 -p 2225:22 -p 3356:3306 -v /home/docker/webs/alpine:/data -h alpine --name alpine --cap-add=NET_ADMIN --restart=always alpine /bin/sh
+
+   docker exec -it alpine /bin/sh
+   
+   vi /etc/network/interfaces
+    auto eth0
+    iface eth0 inet dhcp
+    
+  apk update
+  apk upgrade 
+
+  apk add openrc
+  openrc
+  touch /run/openrc/softlevel
+
+  apk add openssh 
+  rc-update add sshd
+  /etc/init.d/sshd start
+
+  netstat -tnlp
+
 <b>.apk</b>
   apk add|del|search vim
   apk info -a zlib
