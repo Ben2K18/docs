@@ -110,3 +110,45 @@ iface bond0 inet static
 
 <b>.desktop</b>
   apk add xfce4
+
+<b>.nginx</b> 
+   apk add nginx 
+   adduser -D -u 1000 -g 'www' www
+   mkdir /www
+   chown -R www:www /var/lib/nginx
+   chown -R www:www /www 
+
+vi /etc/nginx/nginx.conf
+user                            www;
+worker_processes                1;
+
+error_log                       /var/log/nginx/error.log warn;
+pid                             /var/run/nginx.pid;
+
+events {
+    worker_connections          1024;
+}
+
+http {
+    include                     /etc/nginx/mime.types;
+    default_type                application/octet-stream;
+    sendfile                    on;
+    access_log                  /var/log/nginx/access.log;
+    keepalive_timeout           3000;
+    server {
+        listen                  80;
+        root                    /www;
+        index                   index.html index.htm;
+        server_name             localhost;
+        client_max_body_size    32m;
+        error_page              500 502 503 504  /50x.html;
+        location = /50x.html {
+              root              /var/lib/nginx/html;
+        }
+    }
+}
+
+rc-service nginx start
+rc-service nginx restart
+rc-service nginx stop
+rc-update add nginx default
