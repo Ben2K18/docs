@@ -1,0 +1,7 @@
+.Setting System Hostname
+# echo "shortname" > /etc/hostname
+# hostname -F /etc/hostname
+# echo '192.168.1.150   shortname.domain.com' >> /etc/hosts
+# echo '2001:470:ffff:ff::2   shortname.domain.com' >> /etc/hosts
+
+.
