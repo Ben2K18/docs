@@ -1,6 +1,6 @@
 <pre>
 <b>.apk</b>
-  apk <add|del|search> vim
+  apk add|del|search vim
   
 <b>.Setting System Hostname</b>
 # echo "shortname" > /etc/hostname
