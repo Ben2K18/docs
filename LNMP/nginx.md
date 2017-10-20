@@ -1,5 +1,136 @@
 
 ```nginx
+. 限速
+1. 限制访问请求数
+语法: limit_req_zone $variable zone=name:size rate=rate;
+默认值: none
+配置段: http
+
+设置一块共享内存size MB限制域用来保存键值的状态参数。 
+特别是保存了当前超出请求的数量。 键的值就是指定的变量（空值不会被计算）。如
+limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+
+说明：区域名称为one，大小为10m，平均处理的请求频率不能超过每秒一次。
+
+键是:IP,使用$binary_remote_addr变量， 可以将每条状态记录的大小减少到64个字节，这样1M的内存可以保存大约1万6千个64字节的记录。
+如果限制域的存储空间耗尽了，对于后续所有请求，服务器都会返回 503 (Service Temporarily Unavailable)错误。
+速度可以设置为每秒处理请求数和每分钟处理请求数，其值必须是整数，所以如果你需要指定每秒处理少于1个的请求，2秒处理一个请求，可以使用 “30r/m”。
+
+limit_req_log_level
+语法: limit_req_log_level info | notice | warn | error;
+默认值: limit_req_log_level error;
+配置段: http, server, location
+设置你所希望的日志级别，当服务器因为频率过高拒绝或者延迟处理请求时可以记下相应级别的日志。 延迟记录的日志级别比拒绝的低一个级别；比如， 如果设置“limit_req_log_level notice”， 延迟的日志就是info级别。
+
+limit_req_status
+语法: limit_req_status code;
+默认值: limit_req_status 503;
+配置段: http, server, location
+该指令在1.3.15版本引入。设置拒绝请求的响应状态码。
+
+limit_req
+语法: limit_req zone=name [burst=number] [nodelay];
+默认值: —
+配置段: http, server, location
+设置对应的共享内存限制域和允许被处理的最大请求数阈值。 如果请求的频率超过了限制域配置的值，请求处理会被延迟，所以所有的请求都是以定义的频率被处理的。 超过频率限制的请求会被延迟，直到被延迟的请求数超过了定义的阈值，这时，这个请求会被终止，并返回503 (Service Temporarily Unavailable) 错误。
+
+示例
+http {
+    limit_req_zone $binary_remote_addr zone=eop:10m rate=20r/s;
+
+    server {
+        location  ^~ /download/ {
+            #限制每ip每秒不超过20个请求，漏桶数burst为5
+                    #brust的意思就是，如果第1秒、2,3,4秒请求为19个，
+                    #第5秒的请求为25个是被允许的。
+                    #但是如果你第1秒就25个请求，第2秒超过20的请求返回503错误。
+                    #nodelay，如果不设置该选项，严格使用平均速率限制请求数，
+                    #第1秒25个请求时，5个请求放到第2秒执行，
+                    #设置nodelay，25个请求将在第1秒执行。  
+            limit_req zone=eop burst=5;
+            alias /data/www.eop.com/download/;
+        }
+    }
+}
+
+2. 限制并发连接数
+语法: limit_conn_zone $variable zone=name:size;
+默认值: none
+配置段: http
+键的状态中保存了当前连接数，键的值可以是特定变量的任何非空值（空值将不会被考虑）。
+$variable定义键，zone=name定义区域名称，后面的limit_conn指令会用到的。size定义各个键共享内存空间大小。如：
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+注释：客户端的IP地址作为键。注意，这里使用的是$binary_remote_addr变量，而不是$remote_addr变量。
+$remote_addr变量的长度为7字节到15字节，而存储状态在32位平台中占用32字节或64字节，在64位平台中占用64字节。
+$binary_remote_addr变量的长度是固定的4字节，存储状态在32位平台中占用32字节或64字节，在64位平台中占用64字节。
+1M共享空间可以保存3.2万个32位的状态，1.6万个64位的状态。
+如果共享内存空间被耗尽，服务器将会对后续所有的请求返回 503 (Service Temporarily Unavailable) 错误。
+limit_zone 指令和limit_conn_zone指令同等意思，已经被弃用，就不再做说明了。
+
+limit_conn_log_level
+语法：limit_conn_log_level info | notice | warn | error
+默认值：error
+配置段：http, server, location
+当达到最大限制连接数后，记录日志的等级。
+
+limit_conn
+语法：limit_conn zone_name number
+默认值：none
+配置段：http, server, location
+指定每个给定键值的最大同时连接数，当超过这个数字时被返回503 (Service Temporarily Unavailable)错误。如：
+
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+server {
+    location /www.ttlsa.com/ {
+        limit_conn addr 1;
+    }
+}
+
+同一IP同一时间只允许有一个连接。
+当多个 limit_conn 指令被配置时，所有的连接数限制都会生效。比如，下面配置不仅会限制单一IP来源的连接数，同时也会限制单一虚拟服务器的总连接数：
+
+limit_conn_zone $binary_remote_addr zone=perip:10m;
+limit_conn_zone $server_name zone=perserver:10m;
+server {
+    limit_conn perip 10;
+    limit_conn perserver 100;
+}
+[warning]limit_conn指令可以从上级继承下来。[/warning]
+
+limit_conn_status
+语法: limit_conn_status code;
+默认值: limit_conn_status 503;
+配置段: http, server, location
+该指定在1.3.15版本引入的。指定当超过限制时，返回的状态码。默认是503。
+
+limit_rate
+语法：limit_rate rate
+默认值：0
+配置段：http, server, location, if in location
+对每个连接的速率限制。参数rate的单位是字节/秒，设置为0将关闭限速。 按连接限速而不是按IP限制，因此如果某个客户端同时开启了两个连接，那么客户端的整体速率是这条指令设置值的2倍。
+
+配置示例
+http {
+    geo $whiteiplist  {
+        default 1;
+        218.249.60.68 0;
+    }
+    map $whiteiplist $limit {
+        1 $binary_remote_addr;
+        0 "";
+    }
+    #limit_conn_zone $limit zone=limit:10m;
+    #limit_req_zone $binary_remote_addr zone=limit_req:10m rate=3r/m;
+    limit_req_zone $limit zone=limit_req:10m rate=3r/m;
+    limit_req zone=limit_req burst=1 nodelay;
+    limit_req_status 503;
+    limit_req_log_level error;
+
+    server {
+    }
+}
+
 .limit_conn_zone
 #10m will store 160k requests history
 limit_conn_zone $binary_remote_addr zone=conzone:10m;
