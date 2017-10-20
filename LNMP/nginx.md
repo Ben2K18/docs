@@ -134,4 +134,21 @@ delaycompress: 和compress一起使用时,转储的日志文件到下一次转�
 notifempty: 如果是空文件的话,不转储 
 create mode owner group:转储文件,使用指定的文件模式创建新的日志文件 
 sharedscripts: 运行postrotate脚本(该脚本作用为让nginx重新生成日志文件) 
-postrotate/endscript: 在转储以后需要执行的命令可以放入这个对,这两个关键字必须单独成行 
+postrotate/endscript: 在转储以后需要执行的命令可以放入这个对,这两个关键字必须单独成行
+
+.https
+1. 生成证书
+cd /home/eop/openresty/nginx/conf
+openssl genrsa -des3 -out server.key 1024
+openssl req -new -key server.key -out server.csr
+openssl rsa -in server.key -out server_nopwd.key
+openssl x509 -req -days 365 -in server.csr -signkey server_nopwd.key -out server.crt
+
+2. 配置
+server {
+    listen 443;
+    ssl on;
+    ssl_certificate  /home/eop/openresty/nginx/conf/server.crt;
+    ssl_certificate_key  /home/eop/openresty/nginx/conf/server_nopwd.key;
+}
+
