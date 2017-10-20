@@ -30,13 +30,14 @@ geo $whiteiplist  {
    121.207.242.0/24 0;   
 }
 
-map $whiteiplist  $limit {
+#映射白名单以外的IP为灰色IP，需要限制
+map $whiteiplist  $graylist {
    1 $binary_remote_addr;
    0 "";
 }
 
-limit_conn_zone $limit zone=conzone:10m;
-limit_req_zone $limit zone=reqzone:10m rate=5r/s;
+limit_conn_zone $graylist zone=conzone:10m;
+limit_req_zone $graylist zone=reqzone:10m rate=5r/s;
 
 server {
     location / {    
