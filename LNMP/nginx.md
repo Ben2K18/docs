@@ -9,6 +9,7 @@ limit_conn_zone $binary_remote_addr zone=conzone:10m;
 limit_conn conzone 1000;
 
 
+
 .limit_req_zone
 #5 requests/second from 1 IP address are allowed.
 
@@ -21,6 +22,7 @@ limit_req_zone $binary_remote_addr zone=one:10m rate=5r/s;
 limit_req zone=one burst=10;
 
 limit_req_status 503;
+
 
 
 .limit_rate
@@ -49,14 +51,21 @@ map $whiteiplist  $limit {
 limit_conn_zone $limit zone=conzone:10m;
 
 limit_req_zone $binary_remote_addr zone=reqzone:10m rate=5r/s;
+
 server {
+
     location / {
+    
         limit_conn conzone 4;
+        
 
         limit_req zone=reqzone burst=10;
+        
         limit_req_status 503;
+        
 
         limit_rate 50k;
+        
         limit_rate_after 500k;
    }
 }   
