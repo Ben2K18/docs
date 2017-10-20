@@ -108,3 +108,30 @@ $request_time
 
 $upstream_response_time
 请求过程中，upstream的响应时间。
+
+
+.logrotate
+/home/eop/openresty/nginx/logs/*.log {
+        daily
+        missingok
+        rotate 52
+        compress
+        delaycompress
+        notifempty
+        create 640 nginx adm
+        sharedscripts
+        postrotate
+                [ -f /home/eop/openresty/nginx/logs/nginx.pid ] && kill -USR1 `cat /home/eop/openresty/nginx/logs/nginx.pid`
+        endscript
+}
+
+配置说明: 
+daily: 日志文件每天进行滚动 
+missingok: 如果找不到这个log档案,就忽略过去 
+rotate: 保留最进52次滚动的日志 
+compress: 通过gzip压缩转储以后的日志 
+delaycompress: 和compress一起使用时,转储的日志文件到下一次转储时才压缩
+notifempty: 如果是空文件的话,不转储 
+create mode owner group:转储文件,使用指定的文件模式创建新的日志文件 
+sharedscripts: 运行postrotate脚本(该脚本作用为让nginx重新生成日志文件) 
+postrotate/endscript: 在转储以后需要执行的命令可以放入这个对,这两个关键字必须单独成行 
