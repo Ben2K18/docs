@@ -67,6 +67,8 @@ server {
         limit_rate 50k;
         
         limit_rate_after 500k;
+        
    }
-}   
-```
+   
+}
+
