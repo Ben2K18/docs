@@ -12,13 +12,16 @@ limit_conn conzone 1000;
 #Between 5 and 10 requests/sec all new incoming requests are delayed.
 #Over 10 requests/sec all new incoming requests are rejected with the status code set in limit_req_status
 
-limit_req_zone $binary_remote_addr zone=one:10m rate=5r/s;
-limit_req zone=one burst=10;
+limit_req_zone $binary_remote_addr zone=reqzone:10m rate=5r/s;
+limit_req zone=reqzone burst=10;
 limit_req_status 503;
 
 .limit_rate
 limit_rate 50k;
 limit_rate_after 500k;
+
+///////////////////// Example //////////////////////////
+#除以下白名单外的IP进行连接和请求限制
 
 geo $whiteiplist  {
    default 1;   
@@ -33,7 +36,7 @@ map $whiteiplist  $limit {
 }
 
 limit_conn_zone $limit zone=conzone:10m;
-limit_req_zone $binary_remote_addr zone=reqzone:10m rate=5r/s;
+limit_req_zone $limit zone=reqzone:10m rate=5r/s;
 
 server {
     location / {    
@@ -44,6 +47,5 @@ server {
 
         limit_rate 50k;        
         limit_rate_after 500k;        
-   }   
+   }
 }
-
