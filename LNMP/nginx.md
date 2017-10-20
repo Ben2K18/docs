@@ -1,7 +1,4 @@
-<style>
-   * {white-space: pre; }
-</style>
-
+<pre>
 .limit_conn_zone
 
 #10m will store 160k requests history
