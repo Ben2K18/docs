@@ -4,7 +4,6 @@
 
 
 #10m will store 160k requests history
-
 limit_conn_zone $binary_remote_addr zone=conzone:10m;
 
 #max 1000 connections per IP at any time
