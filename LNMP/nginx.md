@@ -1,5 +1,7 @@
-```nginx
 .limit_conn_zone
+
+
+
 
 #10m will store 160k requests history
 limit_conn_zone $binary_remote_addr zone=conzone:10m;
