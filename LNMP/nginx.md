@@ -1,5 +1,28 @@
 
 ```nginx
+.连接优化
+worker_processes 8;
+
+worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;
+
+worker_rlimit_nofile 102400;
+
+events {
+    use epoll;
+    worker_connections 102400;
+}
+
+http {
+    upstream redisbackend {
+        server 127.0.0.1:6379;
+        keepalive 1000;
+    }
+
+    server {
+        listen 8080 reuseport;
+    }
+}
+
 . 限速
 1. 限制访问请求数
 语法: limit_req_zone $variable zone=name:size rate=rate;
