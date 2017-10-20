@@ -37,13 +37,13 @@ map $whiteiplist  $graylist {
 }
 
 limit_conn_zone $graylist zone=conzone:10m;
-limit_req_zone $graylist zone=reqzone:10m rate=5r/s;
+limit_req_zone $graylist zone=reqzone:10m rate=10r/s;
 
 server {
     location / {    
-        limit_conn conzone 4;
+        limit_conn conzone 8;
         
-        limit_req zone=reqzone burst=10;        
+        limit_req zone=reqzone burst=20;        
         limit_req_status 503;        
 
         limit_rate 50k;        
