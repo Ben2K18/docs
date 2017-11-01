@@ -1,4 +1,5 @@
-.修改文件数
+.kernel优化
+
 #!/bin/bash
 #
 ulimit -SHn 500000
