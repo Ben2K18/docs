@@ -230,7 +230,14 @@ $ uname -o
 
 .issue
  cat /etc/issue
+ lsb_release -a
+ lsmod
  
+.modprobe
+  modprobe -c 列出所有内核模块
+  modprobe ip_tables 加载模块
+  modprobe -r ip_tables 移除模块  
+
 .cpu
  cat /proc/cpuinfo
  
@@ -318,6 +325,77 @@ cmd1 || cmd2 || cmd3
    
 6)使用代理
   export proxy=http://192.168.1.8:8080
-  wget -Y on -p -k http://www.a.com/
+  wget -Y on -p -k  http://www.a.org.cn/i386/a.iso
+  
+  wget -c -r -np -k -L -p -e "http_proxy=http://192.168.1.8:8080" http://www.a.org.cn/i386/a.iso
  
+ 7)定时下载
+   at 23:00
+   at> wget -c http://www.a.com/a.iso
+   at> <c-d>
+   
+.ifconfig
+ ifconfig eth0
+ ethtool eth0
 
+.hardinfo
+ apt install hardinfo
+ 
+.lshw
+ 
+.cfdisk -a
+ 
+.ps
+ a  显示终端上的所有进程，包含其它用户的进程
+ u  显示用户名
+ x  显示没有控制终端的进程
+ 
+ ps aux
+ 
+.kill
+ kill -9 1234
+ pkill -9 xchat
+ killall xchat
+ 
+ .top
+  命令
+  A  以age执行的先后进行排序
+  T  由启动的时间进行排序
+  M  以占用的内存大小进行排序
+  P  以所用CPU资源进行排序
+  
+ .lsof (list open files)
+  lsof -a -p 1234 -d txt
+  列出进程1234的FD标志是txt的打开的文件
+  
+  lsof /tmp
+  列出所有打开/tmp及其下文件的进程
+  
+  lsof -i :21
+  列出监控21端口的进程
+  
+  lsof -u tom
+  列出tom正在使用的文件
+  
+  .patch
+   patch -pl < path.txt
+   把path.txt补充到当前目录下的代码中
+   
+ .ipcalc 子网计算
+  apt install ipcalc
+  
+  ipcalc 192.168.0.1/26 
+  ipcalc 192.168.0.1 255.255.255.0 
+  ipcalc 192.168.0.1 0.0.0.255
+  ipcalc 192.168.0.1/24
+    Address:   192.168.0.1          11000000.10101000.00000000. 00000001
+    Netmask:   255.255.255.0 = 24   11111111.11111111.11111111. 00000000
+    Wildcard:  0.0.0.255            00000000.00000000.00000000. 11111111
+ 
+    Network:   192.168.0.0/24       11000000.10101000.00000000. 00000000
+    HostMin:   192.168.0.1          11000000.10101000.00000000. 00000001
+    HostMax:   192.168.0.254        11000000.10101000.00000000. 11111110
+    Broadcast: 192.168.0.255        11000000.10101000.00000000. 11111111
+    Hosts/Net: 254                   Class C, Private Internet
+
+.
