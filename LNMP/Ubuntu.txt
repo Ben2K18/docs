@@ -523,4 +523,11 @@ cmd1 || cmd2 || cmd3
   ~/.ssh/id_rsa
   
  把公钥添加到远程主机
+ ssh-copy-id user@a.com
  
+ 再次登陆就不用密码了
+ ssh user@a.com
+ 
+ 端口转发
+ ssh -q -L 4025:mail:25 4110:mail:110 user@mail
+ 把4025/4110连接到mail服务器的25与110端口，这样用户只需要访问本机的4025 与 4110就可以了
