@@ -50,3 +50,64 @@ apt install brasero
 apt install gparted
 
 .Ext
+
+.grub
+#默认加载第一个title
+default=0
+
+timeout=5
+
+#进入grub时使用的密码(明文)
+password=123456
+
+#进入grub时使用的密码(密文方式)
+# grub-md5-crypt
+#   Password: xxxx
+#   Retype password:xxxx
+#   $1...MS0
+password --md5 $1...MS0
+
+#默认不显示grub菜单，如果要显示则需要按ESC键
+hiddenmenu
+
+title Ubuntu7.10
+
+#root指/boot分区位置
+#hd0,0 表示第一个硬盘，第一个分区
+
+#指定启动时使用的内核
+kernel /vmlinuz-2.6.22-14-generic
+
+#引导时的初始RAMDISK, 它包含启动时kernel所需的设备驱动模块
+initrd /initrd.img-2.6.22-14-generic
+root (hd0,0)
+
+quiet
+
+.grub 交互命令
+ boot
+ 引导已经被指定并载入的操作系统或链式装载程序
+ 
+ chainloader
+ 将指定的文件做为一个链式装载程序载入， 为将启动的控制权交给某个分区用来启动的第一个扇区，可以使用+1参数来指定
+ 
+ displaymem
+ 显示当前内存的使用情况
+ 
+ initrd
+ 指定引导时可用的RAM盘
+ 
+ install p
+ 安装grub到系统的主引导记录
+ 
+ kernel
+ 指定kernel从grub的根文件系统中载入
+ options选项用在kernel命令后面，在内核载入时传给内核
+ 
+ root
+ 将grub的根分区设置成特定的设备和分区，如(hd0,0)
+ 
+ rootnoverify
+ 同root,只是不载入分区
+ 
+ .grub恢复
