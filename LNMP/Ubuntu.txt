@@ -30,3 +30,23 @@
 
 #df -h  
   /dev/mapper/vg_ora-lv_ora  138G   79G   53G  60% /ora
+
+.DVD做apt source
+mount -t iso9660 -o loop ubuntu.iso /mnt/cdrom
+cp /etc/apt/sources.list /etc/apt/sources.list.bak
+apt-cdrom -m -d /mnt/cdrom add
+
+.cdrecord
+apt install cdrecord
+cdrecord -scanbus
+cdrecord -v speed=24 dev=1,0,0 -data a.iso
+
+apt install dvd+rw-tools
+growisofs -dvd-compat -Z /dev/dvd=/tmp/a.iso
+
+apt install brasero
+
+.分区工具
+apt install gparted
+
+.Ext
