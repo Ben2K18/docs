@@ -412,3 +412,42 @@ cmd1 || cmd2 || cmd3
      Unused:
        192.168.0.64/26 (192.168.0.64-192.168.0.127)
        192.168.0.128/25 (192.168.0.128-255)
+
+.mp3播放器
+ apt install mpg123
+ 
+ #空格暂停/继续 b重放
+ mpg123 -C a.mp3
+ 
+ #播放列表
+ mpg123 -@ Playlist.m3u
+ 
+ #转mp3为wav
+ mpg123 -w a.wav a.mp3
+ 
+ .axel 多线程下载
+  apt install axel
+  -n 多少线程
+  -o 指定保存目录
+  axel -v -n 6 -o /tmp/ http://www.a.com/a.iso
+  
+.apt
+ apt-cache search ipcalc
+ apt-get install ipcalc
+
+.dpkg
+ 安装
+ dpkg -c packname
+ 
+ 查看包信息
+ dpkg -I packname
+ 
+ 查看包内文件
+ dpkg -i packname
+ 
+ 卸载包
+ dpkg -r packname
+ 
+ 列出安装清单
+ dpkg -L packname
+ 
