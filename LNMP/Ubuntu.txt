@@ -204,4 +204,120 @@ cd -- -aa
   -C dir 解压到指定目录中
   tar -xzvf a.tar.gz -C /tmp/a/
   
+.uname
+$ uname -a
+  Linux ubuntu 4.4.0-96-generic #119-Ubuntu SMP Tue Sep 12 14:59:54 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+
+$ uname -s
+  Linux
+
+$ uname -n
+  ubuntu
   
+$ uname -r
+  4.4.0-96-generic
+  
+$ uname -v
+  #119-Ubuntu SMP Tue Sep 12 14:59:54 UTC 2017
+  
+$ uname -m
+$ uname -p
+$ uname -i
+  x86_64
+  
+$ uname -o
+  GNU/Linux
+
+.issue
+ cat /etc/issue
+ 
+.cpu
+ cat /proc/cpuinfo
+ 
+.hostname
+
+.pci
+ lspci -tv
+ 
+.usb
+ lsusb -tv
+ 
+.lsmod 
+
+.mem
+ free -m
+ 
+.disk
+ df -h
+ 
+.size
+ du -sh /tmp
+ 
+.meminfo
+$ cat /proc/meminfo 
+MemTotal:        3939096 kB
+MemFree:         1378428 kB
+MemAvailable:    3304324 kB
+Buffers:          275716 kB
+Cached:          1673004 kB
+SwapCached:          244 kB
+ 
+.负载
+$ uptime
+$ cat /proc/loadavg
+
+.mount
+$ mount | column -t
+$ fdisk -l
+
+.swap
+ swapon -s
+ 
+.hdparm
+ hdparm -i /dev/sda
+ hdparm -tT /dev/sda
+ 
+.dpkg
+ dpkg -L 
+ 
+.bash
+1)
+.bashrc  每次打开新的shell时要执行的命令
+.bash_history 记录用户输入过的命令
+.bash_logout 退出shell时要执行的命令
+
+2)
+cmd1; cmd2; cmd3
+cmd1 && cmd2 && cmd3
+cmd1 || cmd2 || cmd3
+
+3)c-z
+ $ cmd 
+   <c-z>
+ $ bg   把挂起的命令放到后台执行
+ 
+.wget
+1)镜像网站
+  wget -m -k -H http://www.a.com
+  
+2)断点续传 
+  wget -c http://www.a.com/a.zip
+  
+3)批量下载
+  list.txt
+     http://...a.swf
+     http://...a.zip
+     
+  wget -c -i list.txt
+  
+4)下载目录中的所有文件
+   wget -r -np -nd http://www.a.com/download/
+   
+5)下载所有指定扩展名的文件
+   wget -r -np -nd --accept=iso http://www.a.com/i386/
+   
+6)使用代理
+  export proxy=http://192.168.1.8:8080
+  wget -Y on -p -k http://www.a.com/
+ 
+
