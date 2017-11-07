@@ -337,9 +337,27 @@ cmd1 || cmd2 || cmd3
 .ifconfig
  ifconfig eth0
  ethtool eth0
+ ifconfig eth0 192.168.0.22 netmask 255.255.255.0
+ 
+.route
+ route add default gw 192.168.1.1 eth0
+ 
+./etc/resolv.conf
+ nameserver 8.8.8.8 8.8.4.4
 
 .hardinfo
  apt install hardinfo
+ 
+./etc/network/interfaces
+ auto eth0
+ iface eth0 inet static
+ address 192.168.2.100
+ netmask 255.255.255.0
+ gatewary 192.168.2.1
+ up route add default gw 192.168.2.1 eth1
+ up route add -net 192.168.2.0/24 gw 192.168.2.1 eth0
+ down route del -net 102.168.2.0/24 gw 192.168.2.1 eth0
+ 
  
 .lshw
  
@@ -450,4 +468,59 @@ cmd1 || cmd2 || cmd3
  
  列出安装清单
  dpkg -L packname
+ 
+.iptables
+ echo 1 > /proc/sys/net/ipv4/ip_forward
+
+ 清除filter表中所有规则链中的规则
+ iptables [-t filter] -F 
+ 清除filter表中用户定义链中的规则
+ iptables [-t filter] -X 
+ 清除nat表中所有规则
+ iptables -t nat -F
+ 清除nat表中用户定义链中的规则
+ iptables -t nat -X
+ 
+ 默认策略
+ iptables -P INPUT ACCEPT
+ iptables -P OUTPUT ACCEPT
+ iptables -P FORWARD ACCEPT
+ iptables -t nat -P POSTROUTING DROP
+ 
+ -i 从外进入网卡
+ -o 从服务器内部出网卡
+ -s 源
+ -d 目的地址
+ --sport 源端口
+ --dport 目的端口
+ 
+ 打拒绝ACK攻击
+ iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+ iptables -A FORWARD -p tcp ! --syn -m state --state NEW -j DROP
+ 
+ 允许每秒5次icmp包
+ iptables -A INPUT -p icmp --icmp-type 8 -m limit --limit 5/s -j ACCEPT
+ iptables -A INPUT -p icmp --icmp-type 8 -j DROP
+ iptables -A INPUT -p icmp -j ACCEPT
+ 
+ 允许内网FTP
+ iptables -A INPUT -p tcp -i eth1 --dport 20 -j ACCEPT
+ iptables -A INPUT -p tcp -i eth1 --dport 21 -j ACCEPT
+ 
+ 禁止Blaster Worm
+ iptables -A INPUT -i eth0 -p tcp --dport 153 -j DROP
+ iptables -A INPUT -i eth0 -p tcp --dport 707 -j DROP
+ iptables -A OUTPUT -o eth0 -p tcp --dport 153 -j DROP
+ iptables -A OUTPUT -o eth0 -p tcp --dport 707 -j DROP 
+ 
+ 
+ .shorewall
+  apt install shorewall
+  
+.ssh
+ ssh-keygen -t rsa
+  ~/.ssh/id_rsa.pub
+  ~/.ssh/id_rsa
+  
+ 把公钥添加到远程主机
  
