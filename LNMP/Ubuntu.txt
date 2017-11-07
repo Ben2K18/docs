@@ -111,3 +111,56 @@ quiet
  同root,只是不载入分区
  
  .grub恢复
+使用启动盘，进入grub控制台
+grub> root (hd0,0)
+grub> setup (hd0,0)
+
+或进入系统后
+假设/boot磁盘分区在/dev/sda
+# grub-install /dev/sda
+
+.nvidia显卡驱动
+到http://www.nvidia.com/page/home.html下载NVIDIA-Linux-x86-..-pkgl.run
+apt-get --purge remove nvidia-glx nvidia-glx-new
+apt-get install build-essential pkg-config xserver-xorg-dev linux-headers-`uname -r`
+vim /etc/default/linux-restricted-modules-common
+在最后的双引号中添加 nv nvidia_new
+
+/etc/init.d/gdm stop
+./NVIDIA-Linux...-pkgl.run
+/etc/init.d/gdm restart
+
+.允许root登录图形系统
+ 系统-- 系统管理 -- 登录窗口 -- 安全 -- 允许本地系统管理员登录
+ 
+.开机启动程序
+1)图形
+系统 -- 首选项 -- 会话 添加
+
+2)命令行
+ cp a.sh /etc/init.d/
+ update-rc.d a.sh defaults
+ update-rc.d -f a.sh remove
+ 
+.sudo
+ user localhost=(ALL) ALL
+ user localhost=/usr/sbin/shutdown,/usr/sbin/halt
+ %group localhost=/usr/sbin/shutdown,/usr/sbin/halt
+ 
+ HOSt_Alias HOST=localhost,192.168.1.2
+ User_Alias USER=u1,u2,u3
+ Cmnd_Alias CMDS=/usr/bin/shutdown
+ USER HOST=CMDS
+ 
+ user ALL=(ALL) NOPASSWD: ALL
+ 
+2)查看当前用户可执行的命令
+  sudo -l
+  
+  延长密码有效时间
+  sudo -v
+  
+  强迫用户下一次执行sudo输入密码
+  sudo -k
+  
+  
