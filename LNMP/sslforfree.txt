@@ -3,17 +3,22 @@
   
 2)apply
   a) manal verify
+  
   b) download file put into /data/webs/www.a.com/.well-known/acme-challenge/
+  
   c) verify and download crts and key
+  
   d) unzip it get
        certificate.crt
        ca_bundle.crt
        private.key
+       
   e) combined it 
-     cat certificate.crt > /etc/nginx/ssl/www.a.com.crt
-     echo >> /etc/nginx/ssl/www.a.com.crt
-     cat ca_bundle.crt  >> /etc/nginx/ssl/www.a.com.crt
-     echo >> /etc/nginx/ssl/www.a.com.crt
+     crt=/etc/nginx/ssl/www.a.com.crt
+     cat certificate.crt > $crt
+     echo >>  $crt
+     cat ca_bundle.crt  >>  $crt
+     echo >>  $crt
      
   f) dhparam.pem
      openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
