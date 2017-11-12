@@ -6,7 +6,7 @@
 while read line
 do
    read num ip _ <<< "$line"
-   if [ $num -gt  6 ]
+   if [ $num -gt  10 ]
    then
      ufw status |grep $ip >/dev/null
      if [ $? -ne 0 ]
