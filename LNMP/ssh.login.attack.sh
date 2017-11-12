@@ -25,6 +25,13 @@ function iswhite() {
 #banip $ip
 function banip() {
      ip=$1
+     white=$(iswhite $ip)
+     if [ $white -eq 1 ]
+     then
+        echo $ip is white
+        return
+     fi
+
      /usr/sbin/ufw status |grep $ip >/dev/null
      if [ $? -ne 0 ]
      then
@@ -36,14 +43,6 @@ function banip() {
 while read line
 do
    read num ip _ <<< "$line"
-   
-   white=$(iswhite $ip)
-   if [ $white -eq 1 ]
-   then
-      echo $ip is white
-      continue
-   fi
-    
    if [ $num -gt  5 ]
    then
       banip $ip
