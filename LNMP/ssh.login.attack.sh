@@ -3,10 +3,12 @@
 
 2)/data/scripts/ssh.login.attack.sh
 #!/bin/bash
+#ban the ip , which failed nums great than 5 every hour
+#
 while read line
 do
    read num ip _ <<< "$line"
-   if [ $num -gt  10 ]
+   if [ $num -gt  5 ]
    then
      ufw status |grep $ip >/dev/null
      if [ $? -ne 0 ]
