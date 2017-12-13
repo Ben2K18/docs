@@ -13,8 +13,13 @@ $ apt-get install docker-ce
    ln -s /data/docker /var/lib/
    /etc/init.d/docker restart
 
+.)指定ip
+   
+   
+
 3) 创建一个ubuntu:16.04的名为myubuntu的docker, 挂载主机目录/data/docker/data/node.qcourse.cc为docker内/data
-   docker run -it -d -p 8080:80 -p 2222:22 -v /data/docker/data/node.qcourse.cc:/data -h myubuntu --name myubuntu --restart=always ubuntu:16.04 /bin/bash
+   docker network create --subnet 172.18.0.0/24 dockernet
+   docker run -it -d --ip=172.17.0.8 --net=dockernet -p 8080:80 -p 2222:22 -v /data/docker/data/node.qcourse.cc:/data -h myubuntu --name myubuntu --restart=always ubuntu:16.04 /bin/bash
    
    docker update --restart=no|unless-stopped|always myubuntu
    
