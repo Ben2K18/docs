@@ -35,9 +35,7 @@ public class A {
 }
 
 6) 
-a) 指定路径   
-mv A.java ../
-cd ../
+a) 指定路径
 javac -cp /tmp/class  A.java
 java9 -cp /tmp/class A
 
