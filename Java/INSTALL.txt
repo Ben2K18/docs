@@ -1,3 +1,4 @@
 JAVA_HOME=/usr/local/jdk
+#Java提供了额外包dt.jar和tools.jar，所以需要加到classpath中
 CLASSPATH=.:$JAVA_HOME/lib/dt.jar:%JAVA_HOME/lib/tools.jar
 PATH=$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin
