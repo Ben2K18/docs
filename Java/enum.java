@@ -8,7 +8,7 @@ public class A {
         WeekDay today=WeekDay.Mon; 
 
         //输出
-        System.out.println("WeekDay: "+(today)+" "+today.toString()); // Mon Mon
+        System.out.println("WeekDay: "+today+" "+today.toString()); // Mon Mon
 
         //if
         if(today == WeekDay.Mon)
