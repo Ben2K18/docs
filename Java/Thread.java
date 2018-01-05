@@ -11,3 +11,6 @@
                 System.out.println("thread here...");
             }
       })).start();
+
+      //3) sleep ms
+      Thread.sleep(3000); 
