@@ -1,3 +1,22 @@
+Object 
+    InputStream
+        FileInputStream
+        ByteArrayInputStream
+        FilterInputStream
+             BufferedInputStream
+             DateInputStream
+        ObjectInputStream
+    
+    OutputStream
+        FileOutputStream
+        ByteArrayOutputStream
+        FilterOutputStream
+             DataOutputStream
+             BufferedOutputStream
+        ObjectOutputStream
+
+///////////////////////////////////////
+
 import java.io.*;
 
 public class MyIO {
