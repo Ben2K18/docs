@@ -9,3 +9,8 @@ for(char c : chars) {
     System.out.println(Character.toString(c));
     System.out.println(""+c);
 }
+
+
+char[] helloArray = { 'h', 'e', 'l', 'l', 'o', '.' };
+String helloString = new String(helloArray);  
+System.out.println( helloString );
