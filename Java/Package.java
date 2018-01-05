@@ -1,5 +1,5 @@
-1) mkdir abc
-   cd abc
+1) mkdir /tmp/progs
+   cd /tmp/progs
    
 2)
 //a) PA.java 
@@ -13,9 +13,9 @@ public class PB {
 }
 
 3)
-javac -d . PA.java PB.java
+javac -d /tmp/class PA.java PB.java
  
-4) tree .
+4) tree /tmp/class
 ├── com
 │   └── a
 │       └── chat
@@ -33,3 +33,16 @@ public class A {
       
    }
 }
+
+6) 
+a) 指定路径   
+mv A.java ../
+cd ../
+javac -cp /tmp/class  A.java
+java9 -cp /tmp/class A
+
+b) 放到CLASSPATH里
+export CLASSPATH=$CLASSPATH:/tmp/class
+javac A.java
+java A
+
