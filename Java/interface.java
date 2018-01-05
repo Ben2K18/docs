@@ -29,3 +29,7 @@ public interface Hockey extends Sports {
    public void endOfPeriod(int period);
    public void overtimePeriod(int ot);
 }
+
+public interface IAbc extends Football, Hockey {
+   public void abcFunc();
+}
