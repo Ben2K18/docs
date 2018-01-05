@@ -32,3 +32,51 @@ public class MyIO {
         }
     }
 }
+
+//////////////////////////////////////////////////
+
+import java.io.*;
+import java.util.*;
+
+public class MyIO {
+    public static void main(String[] args) {
+        InputStreamReader cin = null;
+        try {
+            cin = new InputStreamReader(System.in);
+            System.out.println("Enter q to quit");
+
+            char c;
+            do {
+                c = (char) cin.read();
+                System.out.println(c);
+            } while(c != 'q');
+
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if(cin != null)
+                    cin.close();
+            } catch(IOException e2) {
+                System.out.println(e.getMessage());    
+            }
+        }
+    }
+}
+
+//////////////////////////////
+
+import java.io.*;
+import java.util.*;
+
+public class MyIO {
+    public static void main(String[] args) {
+        try {
+            Scanner s = new Scanner(System.in);
+            System.out.println(s.next());
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+        }
+    }
+}
