@@ -9,7 +9,7 @@ class ThreadArgs implements Runnable {
     }
 
     public void run(){
-        System.out.println(str);
+        System.out.println(this.str);
     }
 }
 
