@@ -14,6 +14,13 @@ Object
              DataOutputStream
              BufferedOutputStream
         ObjectOutputStream
+        
+///////////////////////////////////////
+
+File f = new File("a.txt");
+InputStream fs = new FileInputStream(f);
+
+InputStream fs = new FileInputStream("a.txt");
 
 ///////////////////////////////////////
 
