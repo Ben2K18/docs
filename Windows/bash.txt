@@ -1,1 +1,1 @@
-
+start cmd /c "c:\\windows\\system32\\bash.exe"
