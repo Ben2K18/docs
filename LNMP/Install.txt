@@ -6,63 +6,10 @@ apt upgrade
     apt install nginx-extras openssl lua5.3
   
 2) intall php
-  apt install php-apigen   \
-php-ast   \
-php-auth   \
-php-console-commandline   \
-php-console-table   \
-php-gettext   \
-php-html-safe   \
-php-http   \
-php-http-webdav-server   \
-php-image-text   \
-php-imagick   \
-php-json   \
-php-memcache   \
-php-memcached   \
-php-mongodb   \
-php-mysql   \
-php-net-dns2   \
-php-net-ftp   \
-php-net-ipv4   \
-php-net-ipv6   \
-php-net-smtp   \
-php-net-socket   \
-php-net-url2   \
-php-pdfparser   \
-php-pear   \
-php-pecl-http   \
-php-readline   \
-php-sqlite3   \
-php-ssh2   \
-php-streams   \
-php-token-stream   \
-php-tokenreflection   \
-php-uuid   \
-php-validate   \
-php7.0   \
-php7.0-bcmath   \
-php7.0-bz2   \
-php7.0-cgi   \
-php7.0-cli   \
-php7.0-common   \
-php7.0-curl   \
-php7.0-dev   \
-php7.0-fpm   \
-php7.0-gd   \
-php7.0-json   \
-php7.0-mbstring   \
-php7.0-mcrypt   \
-php7.0-mysql   \
-php7.0-opcache   \
-php7.0-readline   \
-php7.0-sqlite3   \
-php7.0-xml   \
-php7.0-zip   \
-phpqrcode   \
-phpreports   \
-phpunit   \
-phpwebcounter
+apt install php7.0 php7.0-common php7.0-fpm php7.0-intl php7.0-mysql php7.0-sqlite3 \
+php7.0-bcmath php7.0-curl php7.0-gd php7.0-json php7.0-readline php7.0-zip \
+php7.0-bz2 php7.0-opcache php7.0-cgi php7.0-mbstring php7.0-xml php7.0-cli php7.0-mcrypt                
+ 
 
 3) install mysql
    apt install mysql-server-5.7 mysql-client-5.7     
