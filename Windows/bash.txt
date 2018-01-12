@@ -1,1 +1,9 @@
+1)startbash.bat
 start cmd /c "c:\\windows\\system32\\bash.exe"
+
+2)~/.bashrc
+ps -ef|grep /usr/sbin/sshd|grep -v grep
+if [ $? -ne 0 ]
+then
+   sudo /etc/init.d/ssh start
+fi
