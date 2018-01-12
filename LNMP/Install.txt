@@ -164,7 +164,7 @@ server {
 		
          location / {
              ...
-	     #跨域ajax调用
+	     #跨域APP ajax调用
              #add_header Access-Control-Allow-Origin *;
 	
 	     #iframe
