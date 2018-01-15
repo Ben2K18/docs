@@ -1,0 +1,7 @@
+ipofphp=$(/data/scripts/docker/getip.sh php.a.com)
+ipofmysql=$(/data/scripts/docker/getip.sh mysql.a.com)
+ipofpay=$(/data/scripts/docker/getip.sh pay.a.com)
+
+sed -i "s/server 172.17.0.[0-9];/server $ipofphp;/g" /etc/nginx/sites-enabled/www.a.com
+sed -i "s/server 172.17.0.[0-9];/server $ipofphp;/g" /etc/nginx/sites-enabled/www.a.cc
+sed -i "s/server 172.17.0.[0-9];/server $ipofpay;/g" /etc/nginx/sites-enabled/api.a.com
