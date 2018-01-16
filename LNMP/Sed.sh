@@ -154,3 +154,11 @@ $ sed '1,${/This/d;s/^ *//g}' pets.txt
 
 .使用分号作为定界符
 sed ‘s;/home/tolstor;/home/lt/;’
+
+.把第一行替换成#!/bin/more
+sed -e '1c/#!/bin/more' file
+
+.把 1 到 10 行替换成一行
+ I can do itsed -e '1,10c/I can do it' file
+ 
+.
