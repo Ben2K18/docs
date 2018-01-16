@@ -92,8 +92,9 @@ http {
 
 
 .) 基本配置
-server {
-		 
+server {		
+         ...
+	 
          if ( $request_method !~ ^(GET|HEAD|POST)$ ) {
              deny all;
          }
@@ -118,6 +119,21 @@ server {
          #    allow x.x.x.x;
          #    deny all;
          #}
+	 
+        add_header X-Frame-Options "SAMEORIGN";
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Content-Type-Options "nosniff";
+        index index.html index.php; 
+	
+        location = /favicon.ico {
+            access_log off;
+            log_not_found off;
+        }       
+
+        location = /robots.txt {
+            access_log off;
+            log_not_found off;
+        }
 
          location ~* \.(js|css|jpg|jpeg|gif|png|swf)$ {
              if (-f $request_filename) {
