@@ -135,4 +135,22 @@ sed 's/This is my \([^,&]*\),.*is \(.*\)/\1:\2/g' my.txt
 1不进行替换
 
 
+.
+sed -n 'm,np' a.txt
+sed -n '1,/fish/p' a.txt
+sed -n '/dog/,/fish/p' a.txt
 
+.其中的+3表示/dog/后面连续3行
+$ sed '/dog/,+3s/^/# /g' pets.txt
+
+.对3行到第6行，执行命令/This/d
+$ sed '3,6 {/This/d}' pets.txt
+
+.对3行到第6行，匹配/This/成功后，再匹配/fish/，成功后执行d命令
+$ sed '3,6 {/This/{/fish/d}}' pets.txt
+
+.从第一行到最后一行，如果匹配到This，则删除之；如果前面有空格，则去除空格
+$ sed '1,${/This/d;s/^ *//g}' pets.txt
+
+.使用分号作为定界符
+sed ‘s;/home/tolstor;/home/lt/;’
